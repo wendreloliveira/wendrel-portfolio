@@ -3,34 +3,31 @@ import {
   SiJavascript,
   SiReact,
   SiTypescript,
-  SiHtml5,
-  SiCss as SiCss3,
-  SiFlask,
+  SiNextdotjs,
+  SiFramer,
   SiDjango,
-  SiPostgresql,
+  SiFlask,
   SiGit,
   SiGithub,
   SiTailwindcss,
   SiSupabase,
 } from "react-icons/si";
 import Reveal from "../components/Reveal";
-import SkillBar from "../components/SkillBar";
-import { skills } from "../lib/data";
+import { technologyGroups } from "../lib/data";
 
 const TECH_ICONS = [
   { name: "Python", Icon: SiPython, color: "#4C7CF7" },
   { name: "JavaScript", Icon: SiJavascript, color: "#F2CC60" },
   { name: "React", Icon: SiReact, color: "#4C7CF7" },
+  { name: "Next.js", Icon: SiNextdotjs, color: "#F3F4F6" },
   { name: "TypeScript", Icon: SiTypescript, color: "#4C7CF7" },
-  { name: "HTML", Icon: SiHtml5, color: "#E8734A" },
-  { name: "CSS", Icon: SiCss3, color: "#4C7CF7" },
-  { name: "Flask", Icon: SiFlask, color: "#F3F4F6" },
+  { name: "Tailwind CSS", Icon: SiTailwindcss, color: "#4C7CF7" },
+  { name: "Framer Motion", Icon: SiFramer, color: "#8B6BF2" },
   { name: "Django", Icon: SiDjango, color: "#3ECF8E" },
-  { name: "SQL", Icon: SiPostgresql, color: "#4C7CF7" },
+  { name: "Flask", Icon: SiFlask, color: "#F3F4F6" },
+  { name: "Supabase", Icon: SiSupabase, color: "#3ECF8E" },
   { name: "Git", Icon: SiGit, color: "#E8734A" },
   { name: "GitHub", Icon: SiGithub, color: "#F3F4F6" },
-  { name: "Tailwind", Icon: SiTailwindcss, color: "#4C7CF7" },
-  { name: "Supabase", Icon: SiSupabase, color: "#3ECF8E" },
 ];
 
 export default function Technologies() {
@@ -42,8 +39,14 @@ export default function Technologies() {
         </Reveal>
         <Reveal delay={0.05}>
           <h2 className="max-w-2xl font-display text-3xl font-semibold tracking-tight text-ink sm:text-4xl">
-            Tecnologias &amp; fundamentos
+            Tecnologias em uso real
           </h2>
+        </Reveal>
+        <Reveal delay={0.1}>
+          <p className="mt-5 max-w-xl text-ink-muted">
+            Sem porcentagens. Cada tecnologia aqui foi aplicada em um projeto específico —
+            veja onde na seção de projetos.
+          </p>
         </Reveal>
 
         <div className="mt-14 grid grid-cols-3 gap-4 sm:grid-cols-4 md:grid-cols-6">
@@ -57,25 +60,20 @@ export default function Technologies() {
           ))}
         </div>
 
-        <div className="mt-20 grid gap-16 md:grid-cols-2 md:items-start">
-          <div>
-            <Reveal>
-              <h3 className="font-display text-xl font-medium text-ink">Onde estou hoje</h3>
+        <div className="mt-20 grid gap-10 md:grid-cols-2 md:gap-x-16 md:gap-y-12">
+          {technologyGroups.map((group, gi) => (
+            <Reveal key={group.category} delay={gi * 0.06}>
+              <h3 className="font-display text-lg font-medium text-ink">{group.category}</h3>
+              <div className="mt-4 flex flex-col gap-4">
+                {group.items.map((item) => (
+                  <div key={item.name} className="border-l-2 border-base-border pl-4">
+                    <p className="text-sm font-medium text-ink">{item.name}</p>
+                    <p className="mt-0.5 text-sm leading-relaxed text-ink-muted">{item.usage}</p>
+                  </div>
+                ))}
+              </div>
             </Reveal>
-            <Reveal delay={0.05}>
-              <p className="mt-3 max-w-md text-sm leading-relaxed text-ink-muted">
-                Base sólida em lógica e estruturas de dados, aplicada com Python e Flask no
-                dia a dia — em evolução constante rumo a automação, dados e IA.
-              </p>
-            </Reveal>
-          </div>
-          <div className="flex flex-col gap-6">
-            {skills.map((skill, i) => (
-              <Reveal key={skill.name} delay={i * 0.06}>
-                <SkillBar name={skill.name} level={skill.level} delay={i * 0.06} />
-              </Reveal>
-            ))}
-          </div>
+          ))}
         </div>
       </div>
     </section>
