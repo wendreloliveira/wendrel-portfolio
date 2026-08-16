@@ -17,50 +17,118 @@ export const stats = [
   { value: 6, suffix: " meses", label: "de pesquisa aplicada (PIEMP/CNPq)" },
 ];
 
-export const projects = [
+// Estrutura de mídia comum a todo projeto — populada quando screenshots reais chegarem.
+// Nenhum campo aqui deve receber mockup ou interface fictícia.
+const emptyMedia = () => ({
+  cover: null,
+  desktop: [],
+  mobile: [],
+  details: [],
+  video: null,
+});
+
+// Projetos em destaque — apresentação editorial (estudo de caso completo).
+// layoutVariant controla a composição: "left" (texto à esq./produto à dir.),
+// "right" (produto à esq./texto à dir.) ou "visual" (mídia em maior evidência).
+export const featuredProjects = [
   {
-    title: "ClinicAI SCA",
-    status: "Hackathon",
-    statusColor: "green",
-    description:
-      "Protótipo de IA para apoiar a triagem da Síndrome Coronariana Aguda, desenvolvido em equipe durante o Hackathon Univassouras. Participação em um programa ligado a uma oportunidade de aceleração de até R$ 200 mil.",
-    tags: ["Python", "IA", "Saúde", "Hackathon"],
-    accent: "green",
-    image: null, // troque por um caminho de screenshot real, ex: "/src/assets/projects/clinicai.png"
+    slug: "empregaai",
+    order: 1,
+    title: "EmpregaAI",
+    tagline:
+      "Plataforma inteligente de empregabilidade que conecta pessoas, oportunidades e desenvolvimento profissional.",
+    layoutVariant: "left",
+    accent: "blue",
+    status: "Em desenvolvimento",
+    statusColor: "blue",
+    context:
+      "Nasceu de um projeto multidisciplinar entre Engenharia de Software e Gestão Pública, pensado como uma plataforma para aproximar cidadãos, empresas e oportunidades reais de trabalho.",
+    problem:
+      "Candidatos têm dificuldade para traduzir habilidades reais em oportunidades compatíveis, e processos de seleção carecem de um vocabulário estruturado para comparar perfil e vaga além de palavras-chave soltas.",
+    role:
+      "Atuo no desenvolvimento do produto dentro de uma equipe multidisciplinar, contribuindo com o onboarding e perfil do candidato, o vocabulário estruturado de habilidades e a base da lógica de matching entre perfil e oportunidades.",
+    decisions: [
+      "Vocabulário estruturado de habilidades e áreas, em vez de tags livres, para permitir comparação consistente entre perfil e vaga.",
+      "Onboarding do candidato pensado para capturar habilidades reais, não apenas cargos anteriores.",
+      "Arquitetura pensada para evoluir de matching por regras para recomendação mais sofisticada sem reescrever a base de dados.",
+    ],
+    stack: ["Python", "Django", "SQL"],
     links: [],
+    media: emptyMedia(),
   },
   {
+    slug: "risk",
+    order: 2,
+    title: "RISK Soluções Empresariais",
+    tagline: "Evolução da presença digital de uma empresa real.",
+    layoutVariant: "right",
+    accent: "violet",
+    status: null,
+    statusColor: "violet",
+    context: "",
+    problem: "",
+    role: "",
+    decisions: [],
+    stack: ["React", "Vite", "Tailwind CSS", "Framer Motion"],
+    links: [],
+    media: emptyMedia(),
+  },
+  {
+    slug: "dkastro",
+    order: 3,
+    title: "DKastro",
+    tagline: "",
+    layoutVariant: "visual",
+    accent: "green",
+    status: null,
+    statusColor: "green",
+    context: "",
+    problem: "",
+    role: "",
+    decisions: [],
+    stack: ["Next.js", "TypeScript", "Tailwind CSS", "Framer Motion"],
+    links: [],
+    media: emptyMedia(),
+  },
+];
+
+// Outros projetos & experiências — apresentação compacta, sem estudo de caso completo.
+export const secondaryProjects = [
+  {
+    slug: "vassvegas",
     title: "VassVegas Campus",
     status: "Em desenvolvimento",
     statusColor: "blue",
-    description:
+    tagline:
       "Plataforma universitária que conecta estudantes, empresas, repúblicas, atléticas e parceiros em um único ecossistema digital. Atuo no desenvolvimento do MVP e nas decisões de produto junto a uma equipe multidisciplinar.",
-    tags: ["React", "TypeScript", "Supabase", "Produto"],
+    stack: ["React", "TypeScript", "Supabase"],
     accent: "violet",
-    image: null,
     links: [],
+    media: emptyMedia(),
   },
   {
+    slug: "clinicai",
+    title: "ClinicAI SCA",
+    status: "Hackathon",
+    statusColor: "green",
+    tagline:
+      "Protótipo de IA para apoiar a triagem da Síndrome Coronariana Aguda, desenvolvido em equipe durante o Hackathon Univassouras. Participação em um programa ligado a uma oportunidade de aceleração de até R$ 200 mil.",
+    stack: ["Python", "IA"],
+    accent: "green",
+    links: [],
+    media: emptyMedia(),
+  },
+  {
+    slug: "piemp",
     title: "PIEMP / CNPq",
     status: "Pesquisa",
     statusColor: "amber",
-    description:
+    tagline:
       "Programa de inovação e pesquisa onde desenvolvo soluções envolvendo inteligência artificial, automação e análise de dados ao longo de seis meses.",
-    tags: ["Python", "IA", "Dados", "Automação"],
+    stack: ["Python", "IA", "Dados", "Automação"],
     accent: "blue",
-    image: null,
     links: [],
-  },
-  {
-    title: "EmpregaAI",
-    status: "Em desenvolvimento",
-    statusColor: "blue",
-    description:
-      "Plataforma inteligente voltada para empregabilidade pública, conectando cidadãos, empresas e gestão pública através de inteligência de dados e recomendação de oportunidades.",
-    tags: ["Django", "Python", "GovTech", "IA"],
-    accent: "green",
-    image: null,
-    links: [],
+    media: emptyMedia(),
   },
 ];
 
