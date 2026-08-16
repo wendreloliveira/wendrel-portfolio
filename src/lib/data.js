@@ -1,8 +1,8 @@
 export const profile = {
   name: "Wendrel Oliveira",
-  roles: ["Software Engineer", "Python Developer", "Automation & AI"],
+  roles: ["Engenharia de Software", "Produtos Digitais", "Automação & IA"],
   subtitle:
-    "Estudante de Engenharia de Software na Univassouras, focado em construir produtos reais com Python, automação e inteligência artificial — do protótipo à decisão de produto.",
+    "Estudante de Engenharia de Software na Univassouras construindo experiência prática em produtos digitais, automação e times multidisciplinares — de MVPs em equipe a entregas reais para empresas.",
   location: "Brasil",
   email: "contato@wendrel.dev",
   whatsapp: "https://wa.me/55",
@@ -11,10 +11,10 @@ export const profile = {
 };
 
 export const stats = [
-  { value: 4, suffix: "", label: "projetos em andamento" },
-  { value: 1, suffix: "", label: "hackathon competido" },
-  { value: 200, suffix: "k", label: "em prêmio disputado", prefix: "R$" },
-  { value: 6, suffix: " meses", label: "de pesquisa aplicada" },
+  { value: 5, suffix: "", label: "projetos em construção ou entregues" },
+  { value: 1, suffix: "", label: "projeto real entregue para empresa" },
+  { value: 1, suffix: "", label: "hackathon com prototipação sob pressão" },
+  { value: 6, suffix: " meses", label: "de pesquisa aplicada (PIEMP/CNPq)" },
 ];
 
 export const projects = [
@@ -23,7 +23,7 @@ export const projects = [
     status: "Hackathon",
     statusColor: "green",
     description:
-      "Projeto de IA para auxiliar hospitais na triagem da Síndrome Coronariana Aguda, reduzindo tempo de atendimento e apoiando decisões médicas. Competimos por um programa de aceleração de R$ 200 mil no Hackathon Univassouras.",
+      "Protótipo de IA para apoiar a triagem da Síndrome Coronariana Aguda, desenvolvido em equipe durante o Hackathon Univassouras. Participação em um programa ligado a uma oportunidade de aceleração de até R$ 200 mil.",
     tags: ["Python", "IA", "Saúde", "Hackathon"],
     accent: "green",
     image: null, // troque por um caminho de screenshot real, ex: "/src/assets/projects/clinicai.png"
@@ -92,26 +92,38 @@ export const timeline = [
   },
 ];
 
-export const technologies = [
-  { name: "Python", category: "language" },
-  { name: "JavaScript", category: "language" },
-  { name: "TypeScript", category: "language" },
-  { name: "HTML", category: "language" },
-  { name: "CSS", category: "language" },
-  { name: "SQL", category: "language" },
-  { name: "React", category: "framework" },
-  { name: "Flask", category: "framework" },
-  { name: "Django", category: "framework" },
-  { name: "Tailwind", category: "framework" },
-  { name: "Supabase", category: "platform" },
-  { name: "Git", category: "tool" },
-  { name: "GitHub", category: "tool" },
-];
-
-export const skills = [
-  { name: "Python", level: 92 },
-  { name: "Lógica & Algoritmos", level: 88 },
-  { name: "React / JavaScript", level: 75 },
-  { name: "Automação & IA", level: 80 },
-  { name: "SQL & Modelagem de Dados", level: 78 },
+export const technologyGroups = [
+  {
+    category: "Front-end",
+    items: [
+      { name: "React", usage: "Usado no RISK, no VassVegas Campus e neste portfólio." },
+      { name: "Next.js", usage: "Usado no DKastro." },
+      { name: "TypeScript", usage: "Usado no DKastro e no VassVegas Campus." },
+      { name: "Tailwind CSS", usage: "Usado no RISK, DKastro, VassVegas Campus e neste portfólio." },
+      { name: "Framer Motion", usage: "Usado no RISK, DKastro e neste portfólio." },
+    ],
+  },
+  {
+    category: "Back-end",
+    items: [
+      { name: "Python", usage: "Usado em APIs, automação e lógica de aplicações no EmpregaAI e no PIEMP." },
+      { name: "Django", usage: "Usado no backend do EmpregaAI." },
+      { name: "Flask", usage: "Usado em APIs e projetos backend com Python." },
+    ],
+  },
+  {
+    category: "Dados",
+    items: [
+      { name: "Supabase", usage: "Autenticação, banco de dados e storage do VassVegas Campus." },
+      { name: "SQL", usage: "Modelagem de dados em projetos como PIEMP e EmpregaAI." },
+    ],
+  },
+  {
+    category: "Ferramentas",
+    items: [
+      { name: "Git", usage: "Versionamento em todos os projetos." },
+      { name: "GitHub", usage: "Colaboração e histórico de código em equipe." },
+      { name: "Vite", usage: "Build tool do RISK e deste portfólio." },
+    ],
+  },
 ];
