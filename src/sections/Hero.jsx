@@ -49,7 +49,7 @@ function TerminalCard() {
     { indent: 1, content: [{ c: "kw", v: "def " }, { c: "fn", v: "__init__" }, { c: "plain", v: "(self):" }] },
     { indent: 2, content: [{ c: "plain", v: "self." }, { c: "attr", v: "name" }, { c: "plain", v: " = " }, { c: "str", v: '"Wendrel Oliveira"' }] },
     { indent: 2, content: [{ c: "plain", v: "self." }, { c: "attr", v: "stack" }, { c: "plain", v: " = [" }, { c: "str", v: '"Python"' }, { c: "plain", v: ", " }, { c: "str", v: '"React"' }, { c: "plain", v: ", " }, { c: "str", v: '"IA"' }, { c: "plain", v: "]" }] },
-    { indent: 2, content: [{ c: "plain", v: "self." }, { c: "attr", v: "focus" }, { c: "plain", v: " = " }, { c: "str", v: '"automação + produto"' }] },
+    { indent: 2, content: [{ c: "plain", v: "self." }, { c: "attr", v: "focus" }, { c: "plain", v: " = " }, { c: "str", v: '"produtos digitais + automação"' }] },
     { indent: 1, content: [{ c: "kw", v: "def " }, { c: "fn", v: "disponibilidade" }, { c: "plain", v: "(self):" }] },
     { indent: 2, content: [{ c: "kw", v: "return " }, { c: "bool", v: "True" }] },
   ];
