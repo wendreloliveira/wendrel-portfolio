@@ -1,7 +1,8 @@
 import { motion } from "framer-motion";
 import Reveal from "../components/Reveal";
 import ProjectPreview from "../components/ProjectPreview";
-import { projects } from "../lib/data";
+import ProjectCase from "../components/ProjectCase";
+import { featuredProjects, secondaryProjects } from "../lib/data";
 
 const ACCENTS = {
   green: {
@@ -22,37 +23,43 @@ const ACCENTS = {
     glow: "group-hover:shadow-[0_0_40px_-12px_rgba(139,107,242,0.35)]",
     tag: "bg-signal-violet/10 text-signal-violet border-signal-violet/20",
   },
+  amber: {
+    ring: "hover:border-amber-400/40",
+    dot: "bg-amber-400",
+    glow: "group-hover:shadow-[0_0_40px_-12px_rgba(251,191,36,0.35)]",
+    tag: "bg-amber-400/10 text-amber-400 border-amber-400/20",
+  },
 };
 
-function ProjectCard({ project, index }) {
+function SecondaryProjectCard({ project, index }) {
   const accent = ACCENTS[project.accent];
 
   return (
-    <Reveal delay={index * 0.08} className="h-full">
+    <Reveal delay={index * 0.06} className="h-full">
       <motion.article
-        whileHover={{ y: -6 }}
+        whileHover={{ y: -4 }}
         transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-        className={`group relative flex h-full flex-col rounded-2xl border border-base-border bg-base-surface/50 p-7 transition-all duration-300 ${accent.ring} ${accent.glow}`}
+        className={`group relative flex h-full flex-col rounded-2xl border border-base-border bg-base-surface/50 p-6 transition-all duration-300 ${accent.ring} ${accent.glow}`}
       >
-        <ProjectPreview image={project.image} accent={project.accent} title={project.title} />
+        <ProjectPreview image={project.media?.cover} title={project.title} />
 
-        <div className="mb-4 flex items-center justify-between">
+        <div className="mb-3 flex items-center justify-between">
           <span className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-[11px] font-medium ${accent.tag}`}>
             <span className={`h-1.5 w-1.5 rounded-full ${accent.dot}`} />
             {project.status}
           </span>
         </div>
 
-        <h3 className="font-display text-xl font-semibold text-ink">{project.title}</h3>
-        <p className="mt-3 flex-1 text-sm leading-relaxed text-ink-muted">{project.description}</p>
+        <h3 className="font-display text-lg font-semibold text-ink">{project.title}</h3>
+        <p className="mt-2 flex-1 text-sm leading-relaxed text-ink-muted">{project.tagline}</p>
 
-        <div className="mt-6 flex flex-wrap gap-2">
-          {project.tags.map((tag) => (
+        <div className="mt-5 flex flex-wrap gap-2">
+          {project.stack.map((tech) => (
             <span
-              key={tag}
-              className="rounded-md border border-base-border bg-base-elevated px-2.5 py-1 font-mono text-[11px] text-ink-muted transition-colors duration-200 group-hover:border-base-border hover:!border-signal-blue/40 hover:!text-ink"
+              key={tech}
+              className="rounded-md border border-base-border bg-base-elevated px-2.5 py-1 font-mono text-[11px] text-ink-muted"
             >
-              {tag}
+              {tech}
             </span>
           ))}
         </div>
@@ -62,6 +69,8 @@ function ProjectCard({ project, index }) {
 }
 
 export default function Projects() {
+  const sortedFeatured = [...featuredProjects].sort((a, b) => a.order - b.order);
+
   return (
     <section id="projetos" className="relative scroll-mt-24 overflow-hidden border-t border-base-border py-28">
       <div
@@ -74,19 +83,37 @@ export default function Projects() {
         </Reveal>
         <Reveal delay={0.05}>
           <h2 className="max-w-2xl font-display text-3xl font-semibold tracking-tight text-ink sm:text-4xl">
-            Projetos reais
+            Projetos em destaque
           </h2>
         </Reveal>
         <Reveal delay={0.1}>
           <p className="mt-5 max-w-xl text-ink-muted">
-            Uma combinação de projetos em equipe, sob pressão de tempo e com decisões de produto reais.
+            Três projetos que representam produto, contexto empresarial real e evolução em
+            front-end — apresentados como estudo de caso, não como cards decorativos.
           </p>
         </Reveal>
 
-        <div className="mt-14 grid gap-6 sm:grid-cols-2">
-          {projects.map((project, i) => (
-            <ProjectCard key={project.title} project={project} index={i} />
+        <div className="mt-4">
+          {sortedFeatured.map((project, i) => (
+            <ProjectCase key={project.slug} project={project} index={i} />
           ))}
+        </div>
+
+        <div className="mt-24 border-t border-base-border pt-20">
+          <Reveal>
+            <p className="mb-4 font-mono text-xs uppercase tracking-widest text-signal-blue">Também</p>
+          </Reveal>
+          <Reveal delay={0.05}>
+            <h2 className="max-w-2xl font-display text-2xl font-semibold tracking-tight text-ink sm:text-3xl">
+              Outros projetos &amp; experiências
+            </h2>
+          </Reveal>
+
+          <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {secondaryProjects.map((project, i) => (
+              <SecondaryProjectCard key={project.slug} project={project} index={i} />
+            ))}
+          </div>
         </div>
       </div>
     </section>
