@@ -5,7 +5,8 @@ import GridBackground from "../components/GridBackground";
 import Terminal from "../components/Terminal";
 import { profile } from "../lib/data";
 import MagneticButton from "../components/MagneticButton";
-import heroPhoto from "../assets/hero-photo.jpg";
+import heroPhotoAvif from "../assets/hero-photo.avif";
+import heroPhotoWebp from "../assets/hero-photo.webp";
 
 export default function Hero() {
   const ref = useRef(null);
@@ -112,14 +113,29 @@ export default function Hero() {
           >
             <div aria-hidden="true" className="absolute -inset-6 -z-10 rounded-[2.5rem] bg-grad-signal opacity-[0.15] blur-3xl" />
             <div className="relative overflow-hidden rounded-3xl border border-base-border">
-              <img
-                src={heroPhoto}
-                alt={`Foto de ${profile.name}`}
-                loading="eager"
-                fetchPriority="high"
-                className="aspect-[4/5] w-full object-cover object-top"
-              />
+              {/*
+                A imagem já vem recortada exatamente em 4:5 (mesma proporção do
+                container), então object-cover nunca precisa cortar mais nada —
+                o enquadramento é o mesmo em qualquer breakpoint, sem depender
+                de object-position "no chute".
+              */}
+              <picture>
+                <source srcSet={heroPhotoAvif} type="image/avif" />
+                <source srcSet={heroPhotoWebp} type="image/webp" />
+                <img
+                  src={heroPhotoWebp}
+                  alt={`Foto de ${profile.name}`}
+                  width={960}
+                  height={1200}
+                  loading="eager"
+                  fetchPriority="high"
+                  className="aspect-[4/5] w-full object-cover"
+                />
+              </picture>
+              {/* Dissolve o fundo claro da foto nas bordas inferior/laterais, integrando-a ao fundo escuro do Hero. */}
               <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-base to-transparent" />
+              <div className="pointer-events-none absolute inset-y-0 left-0 w-10 bg-gradient-to-r from-base/70 to-transparent sm:w-14" />
+              <div className="pointer-events-none absolute inset-y-0 right-0 w-10 bg-gradient-to-l from-base/70 to-transparent sm:w-14" />
             </div>
             <div className="mt-4 flex items-center justify-between">
               <span className="text-sm font-medium text-ink">{profile.name}</span>
