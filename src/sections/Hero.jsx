@@ -1,100 +1,11 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef } from "react";
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { HiArrowRight } from "react-icons/hi";
 import GridBackground from "../components/GridBackground";
+import Terminal from "../components/Terminal";
 import { profile } from "../lib/data";
-import HeroProfileCard from "../components/HeroProfileCard";
 import MagneticButton from "../components/MagneticButton";
-
-const ROLE_INTERVAL = 2200;
-
-function RotatingRole() {
-  const [index, setIndex] = useState(0);
-
-  useEffect(() => {
-    const id = setInterval(() => {
-      setIndex((i) => (i + 1) % profile.roles.length);
-    }, ROLE_INTERVAL);
-    return () => clearInterval(id);
-  }, []);
-
-  return (
-    <span className="relative inline-block h-[1.4em] overflow-hidden align-bottom">
-      {profile.roles.map((role, i) => (
-        <motion.span
-          key={role}
-          className="absolute left-0 top-0 whitespace-nowrap text-gradient"
-          initial={false}
-          animate={{
-            y: i === index ? 0 : i < index ? "-100%" : "100%",
-            opacity: i === index ? 1 : 0,
-          }}
-          transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-        >
-          {role}
-        </motion.span>
-      ))}
-      {/* Reserve width for the longest role */}
-      <span className="invisible whitespace-nowrap">
-        {profile.roles.reduce((a, b) => (a.length > b.length ? a : b))}
-      </span>
-    </span>
-  );
-}
-
-function TerminalCard() {
-  const [step, setStep] = useState(0);
-  const fullLines = [
-    { indent: 0, content: [{ c: "kw", v: "class " }, { c: "cls", v: "Developer" }, { c: "plain", v: ":" }] },
-    { indent: 1, content: [{ c: "kw", v: "def " }, { c: "fn", v: "__init__" }, { c: "plain", v: "(self):" }] },
-    { indent: 2, content: [{ c: "plain", v: "self." }, { c: "attr", v: "name" }, { c: "plain", v: " = " }, { c: "str", v: '"Wendrel Oliveira"' }] },
-    { indent: 2, content: [{ c: "plain", v: "self." }, { c: "attr", v: "stack" }, { c: "plain", v: " = [" }, { c: "str", v: '"Python"' }, { c: "plain", v: ", " }, { c: "str", v: '"React"' }, { c: "plain", v: ", " }, { c: "str", v: '"IA"' }, { c: "plain", v: "]" }] },
-    { indent: 2, content: [{ c: "plain", v: "self." }, { c: "attr", v: "focus" }, { c: "plain", v: " = " }, { c: "str", v: '"produtos digitais + automação"' }] },
-    { indent: 1, content: [{ c: "kw", v: "def " }, { c: "fn", v: "disponibilidade" }, { c: "plain", v: "(self):" }] },
-    { indent: 2, content: [{ c: "kw", v: "return " }, { c: "bool", v: "True" }] },
-  ];
-
-  useEffect(() => {
-    if (step >= fullLines.length) return;
-    const id = setTimeout(() => setStep((s) => s + 1), 420);
-    return () => clearTimeout(id);
-  }, [step]);
-
-  const colorMap = {
-    kw: "text-signal-violet",
-    cls: "text-signal-blue",
-    fn: "text-signal-blue",
-    attr: "text-ink",
-    str: "text-signal-green",
-    bool: "text-amber-400",
-    plain: "text-ink-muted",
-  };
-
-  return (
-    <div className="w-full max-w-md rounded-2xl border border-base-border bg-base-surface/80 shadow-soft backdrop-blur-sm">
-      <div className="flex items-center gap-2 border-b border-base-border px-4 py-3">
-        <span className="h-2.5 w-2.5 rounded-full bg-red-500/70" />
-        <span className="h-2.5 w-2.5 rounded-full bg-amber-400/70" />
-        <span className="h-2.5 w-2.5 rounded-full bg-signal-green/70" />
-        <span className="ml-2 font-mono text-xs text-ink-faint">perfil.py</span>
-      </div>
-      <div className="min-h-[220px] p-5 font-mono text-[13px] leading-relaxed">
-        {fullLines.slice(0, step).map((line, i) => (
-          <div key={i} style={{ paddingLeft: `${line.indent * 1.25}rem` }}>
-            {line.content.map((tok, j) => (
-              <span key={j} className={colorMap[tok.c]}>
-                {tok.v}
-              </span>
-            ))}
-          </div>
-        ))}
-        {step < fullLines.length && (
-          <span className="inline-block h-3.5 w-1.5 animate-blink bg-signal-blue align-middle" />
-        )}
-      </div>
-    </div>
-  );
-}
+import heroPhoto from "../assets/hero-photo.jpg";
 
 export default function Hero() {
   const ref = useRef(null);
@@ -102,8 +13,8 @@ export default function Hero() {
   const my = useMotionValue(0);
   const springX = useSpring(mx, { damping: 30, stiffness: 60 });
   const springY = useSpring(my, { damping: 30, stiffness: 60 });
-  const rotateX = useTransform(springY, [-40, 40], [4, -4]);
-  const rotateY = useTransform(springX, [-40, 40], [-4, 4]);
+  const rotateX = useTransform(springY, [-40, 40], [3, -3]);
+  const rotateY = useTransform(springX, [-40, 40], [-3, 3]);
   const translateBg = useTransform(springX, [-40, 40], [-14, 14]);
 
   const handleMouseMove = (e) => {
@@ -126,80 +37,105 @@ export default function Hero() {
       ref={ref}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      className="relative flex min-h-screen items-center overflow-hidden pt-28"
+      className="relative overflow-hidden pt-28"
     >
       <motion.div style={{ x: translateBg }} className="absolute inset-0">
         <GridBackground />
       </motion.div>
 
-      <div className="relative mx-auto grid max-w-6xl gap-16 px-6 pb-20 md:grid-cols-[1.1fr_0.9fr] md:items-center">
-        <div>
-          <motion.span
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="mb-6 inline-flex items-center gap-2 rounded-full border border-base-border bg-base-surface/60 px-4 py-1.5 text-xs text-ink-muted"
-          >
-            <span className="relative flex h-1.5 w-1.5">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-signal-green opacity-75" />
-              <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-signal-green" />
-            </span>
-            disponível para novos projetos
-          </motion.span>
+      <div className="relative mx-auto max-w-6xl px-6 pb-16">
+        {/* Três elementos claros: mensagem, fotografia, prova técnica — sem disputar espaço entre si. */}
+        <div className="grid gap-14 pt-8 md:grid-cols-[1.05fr_0.95fr] md:items-center md:pt-16">
+          <div>
+            <motion.span
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              className="mb-6 inline-flex items-center gap-2 rounded-full border border-base-border bg-base-surface/60 px-4 py-1.5 text-xs text-ink-muted"
+            >
+              <span className="relative flex h-1.5 w-1.5">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-signal-green opacity-75" />
+                <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-signal-green" />
+              </span>
+              disponível para novos projetos
+            </motion.span>
 
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.1 }}
-            className="font-display text-4xl font-semibold leading-[1.08] tracking-tight text-ink sm:text-5xl lg:text-6xl"
-          >
-            {profile.name}
-            <br />
-            <RotatingRole />
-          </motion.h1>
+            <motion.h1
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.1 }}
+              className="font-display text-4xl font-semibold leading-[1.12] tracking-tight text-ink sm:text-5xl lg:text-[3.4rem]"
+            >
+              {profile.headline[0]}
+              <br />
+              <span className="text-gradient">{profile.headline[1]}</span>
+            </motion.h1>
 
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.2 }}
-            className="mt-6 max-w-lg text-base leading-relaxed text-ink-muted sm:text-lg"
-          >
-            {profile.subtitle}
-          </motion.p>
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.2 }}
+              className="mt-6 max-w-lg text-base leading-relaxed text-ink-muted sm:text-lg"
+            >
+              {profile.subtitle}
+            </motion.p>
 
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.3 }}
+              className="mt-10 flex flex-wrap items-center gap-4"
+            >
+              <MagneticButton
+                href="#projetos"
+                className="group inline-flex items-center gap-2 rounded-full bg-grad-signal px-6 py-3 text-sm font-medium text-white shadow-glow transition-shadow duration-300 hover:shadow-[0_0_50px_rgba(76,124,247,0.4)]"
+              >
+                Ver Projetos
+                <HiArrowRight className="transition-transform duration-300 group-hover:translate-x-1" />
+              </MagneticButton>
+              <a
+                href="#contato"
+                className="inline-flex items-center gap-2 rounded-full border border-base-border bg-base-surface/40 px-6 py-3 text-sm font-medium text-ink transition-colors hover:border-ink-faint"
+              >
+                Entrar em Contato
+              </a>
+            </motion.div>
+          </div>
+
+          {/* Fotografia — elemento editorial, não mais um card pequeno sobre o terminal. */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.3 }}
-            className="mt-10 flex flex-wrap items-center gap-4"
+            style={{ rotateX, rotateY, transformPerspective: 1000 }}
+            initial={{ opacity: 0, scale: 0.96 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.8, delay: 0.25, ease: [0.16, 1, 0.3, 1] }}
+            className="relative mx-auto w-full max-w-xs md:max-w-none"
           >
-            <MagneticButton
-              href="#projetos"
-              className="group inline-flex items-center gap-2 rounded-full bg-grad-signal px-6 py-3 text-sm font-medium text-white shadow-glow transition-shadow duration-300 hover:shadow-[0_0_50px_rgba(76,124,247,0.4)]"
-            >
-              Ver Projetos
-              <HiArrowRight className="transition-transform duration-300 group-hover:translate-x-1" />
-            </MagneticButton>
-            <a
-              href="#contato"
-              className="inline-flex items-center gap-2 rounded-full border border-base-border bg-base-surface/40 px-6 py-3 text-sm font-medium text-ink transition-colors hover:border-ink-faint"
-            >
-              Entrar em Contato
-            </a>
+            <div aria-hidden="true" className="absolute -inset-6 -z-10 rounded-[2.5rem] bg-grad-signal opacity-[0.15] blur-3xl" />
+            <div className="relative overflow-hidden rounded-3xl border border-base-border">
+              <img
+                src={heroPhoto}
+                alt={`Foto de ${profile.name}`}
+                loading="eager"
+                fetchPriority="high"
+                className="aspect-[4/5] w-full object-cover object-top"
+              />
+              <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-base to-transparent" />
+            </div>
+            <div className="mt-4 flex items-center justify-between">
+              <span className="text-sm font-medium text-ink">{profile.name}</span>
+              <span className="font-mono text-[11px] uppercase tracking-widest text-ink-faint">{profile.formation}</span>
+            </div>
           </motion.div>
         </div>
 
+        {/* Prova técnica — o terminal vive na própria linha, sem disputar espaço com a foto. */}
         <motion.div
-          style={{ rotateX, rotateY, transformPerspective: 1000 }}
-          initial={{ opacity: 0, scale: 0.94 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.8, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
-          className="mx-auto flex justify-center md:justify-end"
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, delay: 0.4 }}
+          className="mt-16 md:mt-20"
         >
-          <div className="relative flex flex-col items-center gap-6 sm:block sm:pl-10">
-            <HeroProfileCard className="relative sm:absolute sm:-left-8 sm:-top-9 lg:-left-12" />
-            <TerminalCard />
-          </div>
+          <Terminal />
         </motion.div>
       </div>
     </section>
