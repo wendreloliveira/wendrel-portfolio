@@ -1,8 +1,19 @@
-import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
+import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { HiChevronLeft, HiChevronRight } from "react-icons/hi";
 
 const SWIPE_THRESHOLD = 60;
+
+// requestIdleCallback com fallback (Safari não tem) — usado só para não
+// competir com trabalho crítico ao preparar a PRÓXIMA imagem.
+function onIdle(fn) {
+  if (typeof requestIdleCallback === "function") {
+    const id = requestIdleCallback(fn);
+    return () => cancelIdleCallback(id);
+  }
+  const id = setTimeout(fn, 200);
+  return () => clearTimeout(id);
+}
 
 // Viewer de screenshots reutilizável — controla apenas o "qual índice está
 // ativo" e como transicionar entre eles. A apresentação ao redor (dots vs.
@@ -16,6 +27,31 @@ const ProjectMediaViewer = forwardRef(function ProjectMediaViewer(
   // imagem entra na animação, não é usada para nenhuma outra lógica.
   const [[index, direction], setState] = useState([initialIndex, 0]);
   const shouldReduceMotion = useReducedMotion();
+  const wrapperRef = useRef(null);
+
+  // Cada viewer se observa individualmente: o case pai (Projects) já pode
+  // estar montado (deferred no nível da seção), mas isso não significa que
+  // ESTE viewer específico esteja perto da viewport — Projects é muito alto
+  // (~6-7 mil px), então o case do DKastro lá embaixo não deve baixar nada
+  // só porque o do EmpregaAI, no topo, já apareceu. Nenhum `src` real é
+  // fornecido antes disso ficar true.
+  const [nearViewport, setNearViewport] = useState(false);
+
+  useEffect(() => {
+    if (!wrapperRef.current || nearViewport) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          setNearViewport(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: "200px 0px" }
+    );
+    observer.observe(wrapperRef.current);
+    return () => observer.disconnect();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Avisa o pai (para destacar a miniatura certa) depois do commit, nunca
   // dentro do updater do setState acima — chamar o setState de outro
@@ -24,6 +60,20 @@ const ProjectMediaViewer = forwardRef(function ProjectMediaViewer(
   useEffect(() => {
     onIndexChange?.(index);
   }, [index, onIndexChange]);
+
+  // Prepara só a PRÓXIMA imagem (nunca todas de uma vez) — em idle time,
+  // depois que o viewer já está visível, nunca disputando banda com o
+  // carregamento crítico do case. Repete a cada navegação: 01→02 mostra,
+  // 03 é que passa a ser preparada.
+  useEffect(() => {
+    if (!nearViewport || images.length <= 1) return;
+    const nextSrc = images[(index + 1) % images.length].src;
+    return onIdle(() => {
+      const preload = new Image();
+      if ("fetchPriority" in preload) preload.fetchPriority = "low";
+      preload.src = nextSrc;
+    });
+  }, [nearViewport, index, images]);
 
   function goTo(nextIndex) {
     setState(([current]) => {
@@ -61,6 +111,7 @@ const ProjectMediaViewer = forwardRef(function ProjectMediaViewer(
 
   return (
     <div
+      ref={wrapperRef}
       className={`group/viewer relative overflow-hidden rounded-xl border border-base-border bg-base-surface shadow-soft ${className}`}
       role="group"
       aria-roledescription="carousel"
@@ -74,26 +125,33 @@ const ProjectMediaViewer = forwardRef(function ProjectMediaViewer(
         <span className="h-2 w-2 rounded-full bg-signal-green/50" />
       </div>
 
+      {/*
+        Dimensão sempre reservada (aspectClassName), mesmo antes de perto o
+        suficiente da viewport — só o <img> com src real é que espera.
+      */}
       <div className={`relative ${aspectClassName} overflow-hidden bg-base-surface`}>
-        <AnimatePresence initial={false} custom={direction} mode="popLayout">
-          <motion.img
-            key={current.src}
-            src={current.src}
-            alt={current.alt}
-            loading="lazy"
-            decoding="async"
-            custom={direction}
-            drag={multiple ? "x" : false}
-            dragConstraints={{ left: 0, right: 0 }}
-            dragElastic={0.15}
-            onDragEnd={handleDragEnd}
-            initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, x: direction * 40 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, x: direction * -40 }}
-            transition={{ duration: shouldReduceMotion ? 0.15 : 0.35, ease: [0.16, 1, 0.3, 1] }}
-            className={`absolute inset-0 h-full w-full object-cover ${multiple ? "cursor-grab active:cursor-grabbing" : ""}`}
-          />
-        </AnimatePresence>
+        {nearViewport && (
+          <AnimatePresence initial={false} custom={direction} mode="popLayout">
+            <motion.img
+              key={current.src}
+              src={current.src}
+              alt={current.alt}
+              loading="lazy"
+              decoding="async"
+              fetchPriority="low"
+              custom={direction}
+              drag={multiple ? "x" : false}
+              dragConstraints={{ left: 0, right: 0 }}
+              dragElastic={0.15}
+              onDragEnd={handleDragEnd}
+              initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, x: direction * 40 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, x: direction * -40 }}
+              transition={{ duration: shouldReduceMotion ? 0.15 : 0.35, ease: [0.16, 1, 0.3, 1] }}
+              className={`absolute inset-0 h-full w-full object-cover ${multiple ? "cursor-grab active:cursor-grabbing" : ""}`}
+            />
+          </AnimatePresence>
+        )}
 
         {showArrows && multiple && (
           <>
