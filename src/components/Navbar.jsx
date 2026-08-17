@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { HiOutlineMenu, HiX } from "react-icons/hi";
-import avatar from "../assets/avatar.jpg";
+import avatarAvif from "../assets/avatar.avif";
+import avatarWebp from "../assets/avatar.webp";
 
 const LINKS = [
   { label: "Sobre", href: "#sobre" },
@@ -33,11 +34,17 @@ export default function Navbar() {
       <div className="mx-auto flex max-w-6xl items-center justify-between px-6">
         <a href="#topo" className="flex items-center gap-2.5 font-display text-sm font-semibold tracking-tight">
           <span className="group relative flex h-11 w-11 items-center justify-center rounded-full bg-grad-signal p-[2px] shadow-soft transition-transform duration-300 hover:scale-105">
-            <img
-              src={avatar}
-              alt="Wendrel Oliveira"
-              className="h-full w-full rounded-full border-2 border-base object-cover"
-            />
+            <picture>
+              <source srcSet={avatarAvif} type="image/avif" />
+              <source srcSet={avatarWebp} type="image/webp" />
+              <img
+                src={avatarWebp}
+                alt="Wendrel Oliveira"
+                width={256}
+                height={256}
+                className="h-full w-full rounded-full border-2 border-base object-cover"
+              />
+            </picture>
           </span>
           <span className="hidden sm:inline">Wendrel Oliveira</span>
         </a>
