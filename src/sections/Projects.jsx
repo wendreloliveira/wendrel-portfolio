@@ -37,9 +37,10 @@ function SecondaryProjectCard({ project, index }) {
   return (
     <Reveal delay={index * 0.06} className="h-full">
       <motion.article
+        id={project.slug}
         whileHover={{ y: -4 }}
         transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-        className={`group relative flex h-full flex-col rounded-2xl border border-base-border bg-base-surface/50 p-6 transition-all duration-300 ${accent.ring} ${accent.glow}`}
+        className={`group relative flex h-full scroll-mt-24 flex-col rounded-2xl border border-base-border bg-base-surface/50 p-6 transition-all duration-300 ${accent.ring} ${accent.glow}`}
       >
         <ProjectPreview image={project.media?.cover} title={project.title} />
 

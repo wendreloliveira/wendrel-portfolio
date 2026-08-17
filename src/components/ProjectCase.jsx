@@ -214,7 +214,7 @@ export default function ProjectCase({ project, index }) {
   if (variant === "visual") {
     return (
       <Reveal>
-        <article className="border-t border-base-border py-16 first:border-t-0 first:pt-0">
+        <article id={project.slug} className="scroll-mt-24 border-t border-base-border py-16 first:border-t-0 first:pt-0">
           <Media project={project} />
           <div className="mt-8 max-w-2xl">{content}</div>
         </article>
@@ -224,7 +224,10 @@ export default function ProjectCase({ project, index }) {
 
   return (
     <Reveal>
-      <article className="grid gap-10 border-t border-base-border py-16 first:border-t-0 first:pt-0 md:grid-cols-2 md:items-center md:gap-16">
+      <article
+        id={project.slug}
+        className="scroll-mt-24 grid gap-10 border-t border-base-border py-16 first:border-t-0 first:pt-0 md:grid-cols-2 md:items-center md:gap-16"
+      >
         {variant === "right" ? (
           <>
             <Media project={project} />
