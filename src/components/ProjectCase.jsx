@@ -1,8 +1,11 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
+import { HiOutlineExternalLink, HiOutlinePlay } from "react-icons/hi";
 import Reveal from "./Reveal";
 import MediaPlaceholder from "./MediaPlaceholder";
 import ShotFrame from "./ShotFrame";
+import ProjectMediaViewer from "./ProjectMediaViewer";
+import LivePreviewModal from "./LivePreviewModal";
 
 const STATUS_STYLES = {
   green: "bg-signal-green/10 text-signal-green border-signal-green/20",
@@ -21,88 +24,99 @@ function Field({ label, children }) {
   );
 }
 
-// EmpregaAI — composição de produto: tela principal + detalhe sobreposto.
-function ProductMedia({ project }) {
-  const cover = project.media?.cover;
-  const secondary = (project.media?.desktop || []).find((src) => src !== cover);
-
-  if (!cover) {
-    return <MediaPlaceholder className="aspect-[4/3] w-full" label={`${project.title} — aguardando mídia real`} />;
-  }
-
+// Filmstrip/grid de miniaturas clicáveis que pilotam um ProjectMediaViewer
+// externo — é o que dá a cada projeto sua própria "cara" de navegação em
+// vez de todos usarem os mesmos dots.
+function ThumbnailStrip({ images, activeIndex, onSelect, projectTitle, gridClassName, firstSpansTwo = false }) {
   return (
-    <div className="relative pb-8 sm:pb-12">
-      <motion.div
-        initial={{ opacity: 0, y: 24 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: "-80px" }}
-        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-      >
-        <ShotFrame src={cover} alt={`${project.title} — tela principal`} />
-      </motion.div>
-      {secondary && (
-        <motion.div
-          initial={{ opacity: 0, x: -20, y: 20 }}
-          whileInView={{ opacity: 1, x: 0, y: 0 }}
-          viewport={{ once: true, margin: "-80px" }}
-          transition={{ duration: 0.6, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
-          className="absolute -bottom-2 -left-6 hidden w-2/5 sm:block"
+    <div className={gridClassName}>
+      {images.map((img, i) => (
+        <button
+          key={img.src}
+          type="button"
+          onClick={() => onSelect(i)}
+          aria-label={`Ir para imagem ${i + 1} de ${projectTitle}`}
+          aria-current={i === activeIndex}
+          className={`overflow-hidden rounded-lg transition-opacity duration-200 ${
+            i === activeIndex ? "opacity-100 ring-2 ring-signal-blue ring-offset-2 ring-offset-base" : "opacity-60 hover:opacity-90"
+          } ${i === 0 && firstSpansTwo ? "col-span-2" : ""}`}
         >
-          <ShotFrame src={secondary} alt={`${project.title} — detalhe de produto`} className="shadow-[0_20px_50px_-20px_rgba(0,0,0,0.6)]" />
-        </motion.div>
-      )}
+          <ShotFrame src={img.src} alt={img.alt} />
+        </button>
+      ))}
     </div>
   );
 }
 
-// RISK — composição institucional: hero + filmstrip de páginas.
-function InstitutionalMedia({ project }) {
-  const cover = project.media?.cover;
-  const rest = (project.media?.desktop || []).filter((src) => src !== cover).slice(0, 3);
-
-  if (!cover) {
+// EmpregaAI — composição de produto: viewer navegável como tela principal.
+function ProductMedia({ project }) {
+  const images = project.media?.desktop || [];
+  if (images.length === 0) {
     return <MediaPlaceholder className="aspect-[4/3] w-full" label={`${project.title} — aguardando mídia real`} />;
   }
 
   return (
-    <div className="flex flex-col gap-3">
-      <motion.div
-        initial={{ opacity: 0, scale: 0.97 }}
-        whileInView={{ opacity: 1, scale: 1 }}
-        viewport={{ once: true, margin: "-80px" }}
-        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-      >
-        <ShotFrame src={cover} alt={`${project.title} — página inicial`} />
-      </motion.div>
-      {rest.length > 0 && (
-        <div className="grid grid-cols-3 gap-2 sm:gap-3">
-          {rest.map((src, i) => (
-            <motion.div
-              key={src}
-              initial={{ opacity: 0, y: 16 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-60px" }}
-              transition={{ duration: 0.5, delay: i * 0.08, ease: [0.16, 1, 0.3, 1] }}
-            >
-              <ShotFrame src={src} alt={`${project.title} — página ${i + 2}`} />
-            </motion.div>
-          ))}
-        </div>
-      )}
-    </div>
+    <motion.div
+      initial={{ opacity: 0, y: 24 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-80px" }}
+      transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+      className="[filter:drop-shadow(0_20px_50px_rgba(0,0,0,0.35))]"
+    >
+      <ProjectMediaViewer images={images} projectTitle={project.title} aspectClassName="aspect-[4/3]" />
+    </motion.div>
   );
 }
 
-// DKastro — composição editorial: hero com parallax discreto + grid assimétrico.
+// RISK — composição institucional: viewer + filmstrip de páginas clicável.
+function InstitutionalMedia({ project }) {
+  const images = project.media?.desktop || [];
+  const [activeIndex, setActiveIndex] = useState(0);
+  const viewerRef = useRef(null);
+
+  if (images.length === 0) {
+    return <MediaPlaceholder className="aspect-[4/3] w-full" label={`${project.title} — aguardando mídia real`} />;
+  }
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, scale: 0.97 }}
+      whileInView={{ opacity: 1, scale: 1 }}
+      viewport={{ once: true, margin: "-80px" }}
+      transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+      className="flex flex-col gap-3"
+    >
+      <ProjectMediaViewer
+        ref={viewerRef}
+        images={images}
+        projectTitle={project.title}
+        aspectClassName="aspect-[16/11]"
+        showDots={false}
+        onIndexChange={setActiveIndex}
+      />
+      {images.length > 1 && (
+        <ThumbnailStrip
+          images={images}
+          activeIndex={activeIndex}
+          onSelect={(i) => viewerRef.current?.goTo(i)}
+          projectTitle={project.title}
+          gridClassName="grid grid-cols-4 gap-2 sm:gap-3"
+        />
+      )}
+    </motion.div>
+  );
+}
+
+// DKastro — composição editorial: viewer grande com parallax + grid assimétrico clicável.
 function VisualMedia({ project }) {
   const ref = useRef(null);
+  const viewerRef = useRef(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
   const y = useTransform(scrollYProgress, [0, 1], [-16, 16]);
+  const [activeIndex, setActiveIndex] = useState(0);
 
-  const cover = project.media?.cover;
-  const rest = (project.media?.desktop || []).filter((src) => src !== cover);
-
-  if (!cover) {
+  const images = project.media?.desktop || [];
+  if (images.length === 0) {
     return <MediaPlaceholder className="aspect-[16/9] w-full" label={`${project.title} — aguardando mídia real`} />;
   }
 
@@ -114,24 +128,26 @@ function VisualMedia({ project }) {
         whileInView={{ opacity: 1, scale: 1 }}
         viewport={{ once: true, margin: "-100px" }}
         transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-        className="overflow-hidden rounded-2xl border border-base-border"
       >
-        <img src={cover} alt={`${project.title} — hero`} loading="lazy" decoding="async" className="aspect-[16/9] w-full object-cover" />
+        <ProjectMediaViewer
+          ref={viewerRef}
+          images={images}
+          projectTitle={project.title}
+          aspectClassName="aspect-[16/9]"
+          showDots={false}
+          onIndexChange={setActiveIndex}
+        />
       </motion.div>
-      {rest.length > 0 && (
-        <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
-          {rest.map((src, i) => (
-            <motion.div
-              key={src}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-60px" }}
-              transition={{ duration: 0.5, delay: i * 0.07, ease: [0.16, 1, 0.3, 1] }}
-              className={i === 0 ? "col-span-2" : ""}
-            >
-              <ShotFrame src={src} alt={`${project.title} — detalhe ${i + 1}`} />
-            </motion.div>
-          ))}
+      {images.length > 1 && (
+        <div className="mt-4">
+          <ThumbnailStrip
+            images={images}
+            activeIndex={activeIndex}
+            onSelect={(i) => viewerRef.current?.goTo(i)}
+            projectTitle={project.title}
+            gridClassName="grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4"
+          firstSpansTwo
+          />
         </div>
       )}
     </div>
@@ -148,9 +164,10 @@ const MEDIA_BY_VARIANT = {
 // projeto decide texto/mídia e qual composição visual é usada — cada um
 // reflete a natureza do projeto (produto, institucional, editorial).
 export default function ProjectCase({ project, index }) {
-  const { title, tagline, context, problem, role, decisions, stack, status, statusColor, links } = project;
+  const { title, tagline, context, problem, role, decisions, stack, status, statusColor, links, liveUrl, liveCtaLabel } = project;
   const variant = project.layoutVariant || "left";
   const Media = MEDIA_BY_VARIANT[variant] || ProductMedia;
+  const [previewOpen, setPreviewOpen] = useState(false);
 
   const content = (
     <div className="flex flex-col gap-6">
@@ -193,6 +210,28 @@ export default function ProjectCase({ project, index }) {
         </div>
       )}
 
+      {liveUrl && (
+        <div className="flex flex-wrap items-center gap-3 pt-1">
+          <a
+            href={liveUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group inline-flex items-center gap-1.5 rounded-full bg-grad-signal px-5 py-2.5 text-sm font-medium text-white shadow-glow transition-shadow duration-300 hover:shadow-[0_0_40px_rgba(76,124,247,0.35)]"
+          >
+            {liveCtaLabel || "Ver MVP ao vivo"}
+            <HiOutlineExternalLink className="transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" size={15} />
+          </a>
+          <button
+            type="button"
+            onClick={() => setPreviewOpen(true)}
+            className="inline-flex items-center gap-1.5 rounded-full border border-base-border px-5 py-2.5 text-sm font-medium text-ink-muted transition-colors hover:border-signal-blue/40 hover:text-ink"
+          >
+            Preview ao vivo
+            <HiOutlinePlay size={14} />
+          </button>
+        </div>
+      )}
+
       {links?.length > 0 && (
         <div className="flex flex-wrap gap-4">
           {links.map((link) => (
@@ -211,12 +250,17 @@ export default function ProjectCase({ project, index }) {
     </div>
   );
 
+  const preview = liveUrl && (
+    <LivePreviewModal open={previewOpen} onClose={() => setPreviewOpen(false)} url={liveUrl} title={title} />
+  );
+
   if (variant === "visual") {
     return (
       <Reveal>
         <article id={project.slug} className="scroll-mt-24 border-t border-base-border py-16 first:border-t-0 first:pt-0">
           <Media project={project} />
           <div className="mt-8 max-w-2xl">{content}</div>
+          {preview}
         </article>
       </Reveal>
     );
@@ -241,6 +285,7 @@ export default function ProjectCase({ project, index }) {
             </div>
           </>
         )}
+        {preview}
       </article>
     </Reveal>
   );
