@@ -1,9 +1,7 @@
 import { useRef, useState } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
-import { HiOutlineExternalLink, HiOutlinePlay } from "react-icons/hi";
+import { HiChevronLeft, HiChevronRight, HiOutlineExternalLink, HiOutlinePlay } from "react-icons/hi";
 import Reveal from "./Reveal";
 import MediaPlaceholder from "./MediaPlaceholder";
-import ShotFrame from "./ShotFrame";
 import ProjectMediaViewer from "./ProjectMediaViewer";
 import LivePreviewModal from "./LivePreviewModal";
 
@@ -19,273 +17,201 @@ function Field({ label, children }) {
   return (
     <div>
       <p className="font-mono text-[11px] uppercase tracking-widest text-signal-blue">{label}</p>
-      <div className="mt-1.5 text-sm leading-relaxed text-ink-muted">{children}</div>
+      <p className="mt-1.5 text-sm leading-relaxed text-ink-muted">{children}</p>
     </div>
   );
 }
 
-// Filmstrip/grid de miniaturas clicáveis que pilotam um ProjectMediaViewer
-// externo — é o que dá a cada projeto sua própria "cara" de navegação em
-// vez de todos usarem os mesmos dots.
-function ThumbnailStrip({ images, activeIndex, onSelect, projectTitle, gridClassName, firstSpansTwo = false }) {
+function Tag({ children }) {
   return (
-    <div className={gridClassName}>
-      {images.map((img, i) => (
+    <span className="rounded-md border border-base-border bg-base-elevated px-2.5 py-1 font-mono text-[11px] text-ink-muted">
+      {children}
+    </span>
+  );
+}
+
+// Barra de legenda/navegação única para os 3 projetos: contador + legenda do
+// que está sendo mostrado + setas sempre visíveis (não dependem de hover,
+// então funcionam em touch) + dots. Pilota o viewer via ref.
+function MediaCaptionBar({ images, activeIndex, viewerRef, projectTitle }) {
+  const total = images.length;
+  const current = images[activeIndex];
+  if (total <= 1) {
+    return current?.caption ? <p className="mt-3 text-center font-mono text-xs text-ink-faint">{current.caption}</p> : null;
+  }
+
+  return (
+    <div className="mt-4 flex flex-col items-center gap-3">
+      <div className="flex items-center gap-3">
         <button
-          key={img.src}
           type="button"
-          onClick={() => onSelect(i)}
-          aria-label={`Ir para imagem ${i + 1} de ${projectTitle}`}
-          aria-current={i === activeIndex}
-          className={`overflow-hidden rounded-lg transition-opacity duration-200 ${
-            i === activeIndex ? "opacity-100 ring-2 ring-signal-blue ring-offset-2 ring-offset-base" : "opacity-60 hover:opacity-90"
-          } ${i === 0 && firstSpansTwo ? "col-span-2" : ""}`}
+          onClick={() => viewerRef.current?.prev()}
+          aria-label={`Imagem anterior de ${projectTitle}`}
+          className="rounded-full border border-base-border p-2 text-ink-muted transition-colors hover:border-signal-blue/40 hover:text-ink"
         >
-          <ShotFrame src={img.src} alt={img.alt} />
+          <HiChevronLeft size={16} />
         </button>
-      ))}
-    </div>
-  );
-}
-
-// EmpregaAI — composição de produto: viewer navegável como tela principal.
-function ProductMedia({ project }) {
-  const images = project.media?.desktop || [];
-  if (images.length === 0) {
-    return <MediaPlaceholder className="aspect-[4/3] w-full" label={`${project.title} — aguardando mídia real`} />;
-  }
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 24 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-80px" }}
-      transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-      className="[filter:drop-shadow(0_20px_50px_rgba(0,0,0,0.35))]"
-    >
-      <ProjectMediaViewer images={images} projectTitle={project.title} aspectClassName="aspect-[4/3]" />
-    </motion.div>
-  );
-}
-
-// RISK — composição institucional: viewer + filmstrip de páginas clicável.
-function InstitutionalMedia({ project }) {
-  const images = project.media?.desktop || [];
-  const [activeIndex, setActiveIndex] = useState(0);
-  const viewerRef = useRef(null);
-
-  if (images.length === 0) {
-    return <MediaPlaceholder className="aspect-[4/3] w-full" label={`${project.title} — aguardando mídia real`} />;
-  }
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, scale: 0.97 }}
-      whileInView={{ opacity: 1, scale: 1 }}
-      viewport={{ once: true, margin: "-80px" }}
-      transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-      className="flex flex-col gap-3"
-    >
-      <ProjectMediaViewer
-        ref={viewerRef}
-        images={images}
-        projectTitle={project.title}
-        aspectClassName="aspect-[16/11]"
-        showDots={false}
-        onIndexChange={setActiveIndex}
-      />
-      {images.length > 1 && (
-        <ThumbnailStrip
-          images={images}
-          activeIndex={activeIndex}
-          onSelect={(i) => viewerRef.current?.goTo(i)}
-          projectTitle={project.title}
-          gridClassName="grid grid-cols-4 gap-2 sm:gap-3"
-        />
-      )}
-    </motion.div>
-  );
-}
-
-// DKastro — composição editorial: viewer grande com parallax + grid assimétrico clicável.
-function VisualMedia({ project }) {
-  const ref = useRef(null);
-  const viewerRef = useRef(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
-  const y = useTransform(scrollYProgress, [0, 1], [-16, 16]);
-  const [activeIndex, setActiveIndex] = useState(0);
-
-  const images = project.media?.desktop || [];
-  if (images.length === 0) {
-    return <MediaPlaceholder className="aspect-[16/9] w-full" label={`${project.title} — aguardando mídia real`} />;
-  }
-
-  return (
-    <div ref={ref}>
-      <motion.div
-        style={{ y }}
-        initial={{ opacity: 0, scale: 1.02 }}
-        whileInView={{ opacity: 1, scale: 1 }}
-        viewport={{ once: true, margin: "-100px" }}
-        transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-      >
-        <ProjectMediaViewer
-          ref={viewerRef}
-          images={images}
-          projectTitle={project.title}
-          aspectClassName="aspect-[16/9]"
-          showDots={false}
-          onIndexChange={setActiveIndex}
-        />
-      </motion.div>
-      {images.length > 1 && (
-        <div className="mt-4">
-          <ThumbnailStrip
-            images={images}
-            activeIndex={activeIndex}
-            onSelect={(i) => viewerRef.current?.goTo(i)}
-            projectTitle={project.title}
-            gridClassName="grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4"
-          firstSpansTwo
+        <p className="min-w-0 font-mono text-xs text-ink-muted">
+          <span className="text-ink">
+            {String(activeIndex + 1).padStart(2, "0")}/{String(total).padStart(2, "0")}
+          </span>
+          {current?.caption && <span className="ml-2 text-ink-faint">— {current.caption}</span>}
+        </p>
+        <button
+          type="button"
+          onClick={() => viewerRef.current?.next()}
+          aria-label={`Próxima imagem de ${projectTitle}`}
+          className="rounded-full border border-base-border p-2 text-ink-muted transition-colors hover:border-signal-blue/40 hover:text-ink"
+        >
+          <HiChevronRight size={16} />
+        </button>
+      </div>
+      <div className="flex items-center gap-1.5">
+        {images.map((img, i) => (
+          <button
+            key={img.src}
+            type="button"
+            onClick={() => viewerRef.current?.goTo(i)}
+            aria-label={`Ir para imagem ${i + 1} de ${projectTitle}`}
+            aria-current={i === activeIndex}
+            className={`h-1.5 rounded-full transition-all duration-300 ${
+              i === activeIndex ? "w-4 bg-signal-blue" : "w-1.5 bg-base-border hover:bg-ink-faint"
+            }`}
           />
-        </div>
-      )}
+        ))}
+      </div>
     </div>
   );
 }
 
-const MEDIA_BY_VARIANT = {
-  left: ProductMedia,
-  right: InstitutionalMedia,
-  visual: VisualMedia,
-};
-
-// Estudo de caso editorial dos projetos em destaque. O layoutVariant do
-// projeto decide texto/mídia e qual composição visual é usada — cada um
-// reflete a natureza do projeto (produto, institucional, editorial).
+// Estudo de caso — design system único para os 3 projetos em destaque.
+// A identidade de cada um vem do conteúdo (screenshots, copy, status,
+// stack), não de uma estrutura de layout diferente por projeto.
 export default function ProjectCase({ project, index }) {
-  const { title, tagline, context, problem, role, decisions, stack, status, statusColor, links, liveUrl, liveCtaLabel } = project;
-  const variant = project.layoutVariant || "left";
-  const Media = MEDIA_BY_VARIANT[variant] || ProductMedia;
+  const { slug, title, category, tagline, context, problem, role, decisions, stack, status, statusColor, links, liveUrl, liveCtaLabel } =
+    project;
+  const images = project.media?.desktop || [];
+  const viewerRef = useRef(null);
+  const [activeIndex, setActiveIndex] = useState(0);
   const [previewOpen, setPreviewOpen] = useState(false);
 
-  const content = (
-    <div className="flex flex-col gap-6">
-      <div>
-        <span className="font-mono text-xs text-ink-faint">0{index + 1}</span>
-        <h3 className="mt-2 font-display text-2xl font-semibold tracking-tight text-ink sm:text-3xl">{title}</h3>
-        {tagline && <p className="mt-2 max-w-md text-ink-muted">{tagline}</p>}
-        {status && (
-          <span
-            className={`mt-4 inline-flex items-center rounded-full border px-3 py-1 text-[11px] font-medium ${STATUS_STYLES[statusColor] || STATUS_STYLES.blue}`}
-          >
-            {status}
-          </span>
-        )}
-      </div>
-
-      <Field label="Contexto">{context}</Field>
-      <Field label="Problema">{problem}</Field>
-      <Field label="Minha participação">{role}</Field>
-      <Field label="Decisões">
-        {decisions?.length > 0 && (
-          <ul className="flex flex-col gap-1.5">
-            {decisions.map((d) => (
-              <li key={d}>— {d}</li>
-            ))}
-          </ul>
-        )}
-      </Field>
-
-      {stack?.length > 0 && (
-        <div className="flex flex-wrap gap-2">
-          {stack.map((tech) => (
-            <span
-              key={tech}
-              className="rounded-md border border-base-border bg-base-elevated px-2.5 py-1 font-mono text-[11px] text-ink-muted"
-            >
-              {tech}
-            </span>
-          ))}
-        </div>
-      )}
-
-      {liveUrl && (
-        <div className="flex flex-wrap items-center gap-3 pt-1">
-          <a
-            href={liveUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="group inline-flex items-center gap-1.5 rounded-full bg-grad-signal px-5 py-2.5 text-sm font-medium text-white shadow-glow transition-shadow duration-300 hover:shadow-[0_0_40px_rgba(76,124,247,0.35)]"
-          >
-            {liveCtaLabel || "Ver MVP ao vivo"}
-            <HiOutlineExternalLink className="transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" size={15} />
-          </a>
-          <button
-            type="button"
-            onClick={() => setPreviewOpen(true)}
-            className="inline-flex items-center gap-1.5 rounded-full border border-base-border px-5 py-2.5 text-sm font-medium text-ink-muted transition-colors hover:border-signal-blue/40 hover:text-ink"
-          >
-            Preview ao vivo
-            <HiOutlinePlay size={14} />
-          </button>
-        </div>
-      )}
-
-      {links?.length > 0 && (
-        <div className="flex flex-wrap gap-4">
-          {links.map((link) => (
-            <a
-              key={link.href}
-              href={link.href}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-sm font-medium text-signal-blue hover:underline"
-            >
-              {link.label}
-            </a>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-
-  const preview = liveUrl && (
-    <LivePreviewModal open={previewOpen} onClose={() => setPreviewOpen(false)} url={liveUrl} title={title} />
-  );
-
-  if (variant === "visual") {
-    return (
-      <Reveal>
-        <article id={project.slug} className="scroll-mt-24 border-t border-base-border py-16 first:border-t-0 first:pt-0">
-          <Media project={project} />
-          <div className="mt-8 max-w-2xl">{content}</div>
-          {preview}
-        </article>
-      </Reveal>
-    );
-  }
+  // Contexto e problema viram um único parágrafo — mesmo significado,
+  // menos títulos disputando atenção ao mesmo tempo na tela.
+  const contextText = [context, problem].filter(Boolean).join(" ");
 
   return (
     <Reveal>
-      <article
-        id={project.slug}
-        className="scroll-mt-24 grid gap-10 border-t border-base-border py-16 first:border-t-0 first:pt-0 md:grid-cols-2 md:items-center md:gap-16"
-      >
-        {variant === "right" ? (
-          <>
-            <Media project={project} />
-            {content}
-          </>
-        ) : (
-          <>
-            <div className="order-2 md:order-1">{content}</div>
-            <div className="order-1 md:order-2">
-              <Media project={project} />
+      <article id={slug} className="scroll-mt-24 border-t border-base-border py-20 first:border-t-0 first:pt-0 sm:py-24">
+        <div className="mx-auto max-w-3xl">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <p className="font-mono text-xs uppercase tracking-widest text-signal-blue">
+              0{index + 1} — {category}
+            </p>
+            {status && (
+              <span
+                className={`inline-flex items-center rounded-full border px-3 py-1 text-[11px] font-medium ${STATUS_STYLES[statusColor] || STATUS_STYLES.blue}`}
+              >
+                {status}
+              </span>
+            )}
+          </div>
+
+          <h3 className="mt-3 font-display text-3xl font-semibold tracking-tight text-ink sm:text-4xl">{title}</h3>
+          {tagline && <p className="mt-3 text-ink-muted">{tagline}</p>}
+
+          {stack?.length > 0 && (
+            <div className="mt-4 flex flex-wrap gap-2">
+              {stack.map((tech) => (
+                <Tag key={tech}>{tech}</Tag>
+              ))}
             </div>
-          </>
-        )}
-        {preview}
+          )}
+        </div>
+
+        <div className="mx-auto mt-8 max-w-5xl sm:mt-10">
+          {images.length > 0 ? (
+            <>
+              <ProjectMediaViewer
+                ref={viewerRef}
+                images={images}
+                projectTitle={title}
+                aspectClassName="aspect-video"
+                showArrows={false}
+                showDots={false}
+                onIndexChange={setActiveIndex}
+              />
+              <MediaCaptionBar images={images} activeIndex={activeIndex} viewerRef={viewerRef} projectTitle={title} />
+            </>
+          ) : (
+            <MediaPlaceholder className="aspect-video w-full" label={`${title} — aguardando mídia real`} />
+          )}
+        </div>
+
+        <div className="mx-auto mt-8 max-w-3xl sm:mt-10">
+          {liveUrl && (
+            <div className="flex flex-wrap items-center gap-3">
+              <a
+                href={liveUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group inline-flex items-center gap-1.5 rounded-full bg-grad-signal px-5 py-2.5 text-sm font-medium text-white shadow-glow transition-shadow duration-300 hover:shadow-[0_0_40px_rgba(76,124,247,0.35)]"
+              >
+                {liveCtaLabel || "Ver MVP ao vivo"}
+                <HiOutlineExternalLink className="transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" size={15} />
+              </a>
+              <button
+                type="button"
+                onClick={() => setPreviewOpen(true)}
+                className="inline-flex items-center gap-1.5 rounded-full border border-base-border px-5 py-2.5 text-sm font-medium text-ink-muted transition-colors hover:border-signal-blue/40 hover:text-ink"
+              >
+                Preview ao vivo
+                <HiOutlinePlay size={14} />
+              </button>
+            </div>
+          )}
+
+          <div className="mt-10 grid gap-8 lg:grid-cols-2 lg:gap-10">
+            <Field label="Contexto">{contextText}</Field>
+            <Field label="Minha participação">{role}</Field>
+          </div>
+
+          {decisions?.length > 0 && (
+            <div className="mt-8">
+              <p className="font-mono text-[11px] uppercase tracking-widest text-signal-blue">Principais decisões</p>
+              <ol className="mt-3 flex flex-col gap-2.5">
+                {decisions.map((d, i) => (
+                  <li key={d} className="flex gap-3 text-sm leading-relaxed text-ink-muted">
+                    <span className="shrink-0 font-mono text-ink-faint">{String(i + 1).padStart(2, "0")}</span>
+                    <span>{d}</span>
+                  </li>
+                ))}
+              </ol>
+            </div>
+          )}
+
+          {stack?.length > 0 && (
+            <div className="mt-8">
+              <p className="font-mono text-[11px] uppercase tracking-widest text-signal-blue">Stack</p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {stack.map((tech) => (
+                  <Tag key={tech}>{tech}</Tag>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {links?.length > 0 && (
+            <div className="mt-6 flex flex-wrap gap-4">
+              {links.map((link) => (
+                <a key={link.href} href={link.href} target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-signal-blue hover:underline">
+                  {link.label}
+                </a>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {liveUrl && <LivePreviewModal open={previewOpen} onClose={() => setPreviewOpen(false)} url={liveUrl} title={title} />}
       </article>
     </Reveal>
   );
