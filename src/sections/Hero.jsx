@@ -48,9 +48,17 @@ export default function Hero() {
         {/* Três elementos claros: mensagem, fotografia, prova técnica — sem disputar espaço entre si. */}
         <div className="grid gap-14 pt-8 md:grid-cols-[1.05fr_0.95fr] md:items-center md:pt-16">
           <div>
+            {/*
+              Texto crítico do Hero (H1 = LCP medido via Lighthouse) não pode
+              depender de opacity:0 → 1 via JS para ficar visível — isso mede
+              como "element render delay" no LCP (1,5s+ medidos). Por isso só
+              a posição (y) anima aqui; opacidade fica sempre em 1, então o
+              conteúdo já está pintado no primeiro paint, só se reacomodando
+              alguns pixels em seguida.
+            */}
             <motion.span
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
+              initial={{ y: 12 }}
+              animate={{ y: 0 }}
               transition={{ duration: 0.6 }}
               className="mb-6 inline-flex items-center gap-2 rounded-full border border-base-border bg-base-surface/60 px-4 py-1.5 text-xs text-ink-muted"
             >
@@ -62,8 +70,8 @@ export default function Hero() {
             </motion.span>
 
             <motion.h1
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
+              initial={{ y: 20 }}
+              animate={{ y: 0 }}
               transition={{ duration: 0.7, delay: 0.1 }}
               className="font-display text-4xl font-semibold leading-[1.12] tracking-tight text-ink sm:text-5xl lg:text-[3.4rem]"
             >
@@ -73,8 +81,8 @@ export default function Hero() {
             </motion.h1>
 
             <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
+              initial={{ y: 20 }}
+              animate={{ y: 0 }}
               transition={{ duration: 0.7, delay: 0.2 }}
               className="mt-6 max-w-lg text-base leading-relaxed text-ink-muted sm:text-lg"
             >
@@ -82,8 +90,8 @@ export default function Hero() {
             </motion.p>
 
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
+              initial={{ y: 20 }}
+              animate={{ y: 0 }}
               transition={{ duration: 0.7, delay: 0.3 }}
               className="mt-10 flex flex-wrap items-center gap-4"
             >
