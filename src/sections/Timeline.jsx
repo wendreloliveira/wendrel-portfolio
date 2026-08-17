@@ -12,7 +12,7 @@ export default function Timeline() {
   const lineHeight = useTransform(scrollYProgress, [0, 1], ["0%", "100%"]);
 
   return (
-    <section id="timeline" className="relative scroll-mt-24 border-t border-base-border py-28">
+    <section className="relative border-t border-base-border py-28">
       <div className="mx-auto max-w-4xl px-6">
         <Reveal>
           <p className="mb-4 font-mono text-xs uppercase tracking-widest text-signal-blue">Trajetória</p>

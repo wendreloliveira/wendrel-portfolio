@@ -32,7 +32,7 @@ const TECH_ICONS = [
 
 export default function Technologies() {
   return (
-    <section id="tecnologias" className="relative scroll-mt-24 border-t border-base-border py-28">
+    <section className="relative border-t border-base-border py-28">
       <div className="mx-auto max-w-6xl px-6">
         <Reveal>
           <p className="mb-4 font-mono text-xs uppercase tracking-widest text-signal-blue">Stack</p>

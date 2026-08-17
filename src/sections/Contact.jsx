@@ -37,7 +37,7 @@ const CHANNELS = [
 
 export default function Contact() {
   return (
-    <section id="contato" className="relative scroll-mt-24 overflow-hidden border-t border-base-border py-28">
+    <section className="relative overflow-hidden border-t border-base-border py-28">
       <div
         className="pointer-events-none absolute -bottom-32 left-1/2 h-[400px] w-[600px] -translate-x-1/2 rounded-full bg-signal-blue/10 blur-[130px]"
         aria-hidden="true"

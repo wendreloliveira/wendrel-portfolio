@@ -73,7 +73,7 @@ export default function Projects() {
   const sortedFeatured = [...featuredProjects].sort((a, b) => a.order - b.order);
 
   return (
-    <section id="projetos" className="relative scroll-mt-24 overflow-hidden border-t border-base-border py-28">
+    <section className="relative overflow-hidden border-t border-base-border py-28">
       <div
         className="pointer-events-none absolute -top-32 right-0 h-[400px] w-[400px] rounded-full bg-signal-violet/10 blur-[130px]"
         aria-hidden="true"

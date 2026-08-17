@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { technologyGroups, featuredProjects } from "../lib/data";
+import { forceLoad } from "./Deferred";
 
 const PROMPT = "PS C:\\wendrel>";
 
@@ -28,10 +29,25 @@ const HELP_LINES = [
   "clear             limpa o terminal",
 ];
 
-// Navegação por id: cada case (ProjectCase/SecondaryProjectCard) e a seção de
-// contato têm um id real no DOM — "abrir" um projeto é só rolar até ele.
+// Navegação por id. As seções abaixo da dobra são deferred (Deferred.jsx):
+// os wrappers ("projetos", "timeline", "tecnologias", "contato") já têm o id
+// desde o primeiro render, mas ids de sub-conteúdo (ex.: "empregaai", que só
+// existe depois que Projects monta de verdade) podem não estar no DOM ainda.
+// forceLoad dispara o import/montagem; o polling espera o elemento aparecer
+// antes de rolar — funciona tanto pros wrappers (já existem, resolve na
+// primeira checagem) quanto pros sub-ids (resolve assim que montarem).
 function goToSection(id) {
-  document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+  forceLoad(id);
+  const start = performance.now();
+  function attempt() {
+    const el = document.getElementById(id);
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth", block: "start" });
+      return;
+    }
+    if (performance.now() - start < 2000) setTimeout(attempt, 50);
+  }
+  attempt();
 }
 
 // Parser de comandos: recebe a linha crua, decide o que fazer e devolve as

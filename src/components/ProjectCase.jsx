@@ -1,9 +1,13 @@
-import { useRef, useState } from "react";
+import { lazy, Suspense, useRef, useState } from "react";
 import { HiChevronLeft, HiChevronRight, HiOutlineExternalLink, HiOutlinePlay } from "react-icons/hi";
 import Reveal from "./Reveal";
 import MediaPlaceholder from "./MediaPlaceholder";
 import ProjectMediaViewer from "./ProjectMediaViewer";
-import LivePreviewModal from "./LivePreviewModal";
+
+// Import dinâmico de verdade: o código do modal (portal, foco, iframe) só é
+// pedido ao navegador no primeiro clique em "Preview ao vivo" — antes disso,
+// zero bytes dele estão no bundle inicial, não só "não renderizado".
+const LivePreviewModal = lazy(() => import("./LivePreviewModal"));
 
 const STATUS_STYLES = {
   green: "bg-signal-green/10 text-signal-green border-signal-green/20",
@@ -94,6 +98,11 @@ export default function ProjectCase({ project, index }) {
   const viewerRef = useRef(null);
   const [activeIndex, setActiveIndex] = useState(0);
   const [previewOpen, setPreviewOpen] = useState(false);
+  // Uma vez aberto, o modal continua montado mesmo fechado — senão a
+  // animação de saída (AnimatePresence dentro do LivePreviewModal) é
+  // cortada de repente ao desmontar. O que importa pro bundle inicial é só
+  // não montar (e não importar) ANTES do primeiro clique.
+  const [hasOpenedPreview, setHasOpenedPreview] = useState(false);
 
   // Contexto e problema viram um único parágrafo — mesmo significado,
   // menos títulos disputando atenção ao mesmo tempo na tela.
@@ -161,7 +170,10 @@ export default function ProjectCase({ project, index }) {
               </a>
               <button
                 type="button"
-                onClick={() => setPreviewOpen(true)}
+                onClick={() => {
+                  setHasOpenedPreview(true);
+                  setPreviewOpen(true);
+                }}
                 className="inline-flex items-center gap-1.5 rounded-full border border-base-border px-5 py-2.5 text-sm font-medium text-ink-muted transition-colors hover:border-signal-blue/40 hover:text-ink"
               >
                 Preview ao vivo
@@ -211,7 +223,11 @@ export default function ProjectCase({ project, index }) {
           )}
         </div>
 
-        {liveUrl && <LivePreviewModal open={previewOpen} onClose={() => setPreviewOpen(false)} url={liveUrl} title={title} />}
+        {hasOpenedPreview && (
+          <Suspense fallback={null}>
+            <LivePreviewModal open={previewOpen} onClose={() => setPreviewOpen(false)} url={liveUrl} title={title} />
+          </Suspense>
+        )}
       </article>
     </Reveal>
   );
