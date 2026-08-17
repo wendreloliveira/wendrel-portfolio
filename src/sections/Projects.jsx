@@ -89,8 +89,8 @@ export default function Projects() {
         </Reveal>
         <Reveal delay={0.1}>
           <p className="mt-5 max-w-xl text-ink-muted">
-            Três projetos que representam produto, contexto empresarial real e evolução em
-            front-end — apresentados como estudo de caso, não como cards decorativos.
+            Produtos e experiências digitais que construí em contextos multidisciplinares e
+            empresariais — cada um documentado como estudo de caso.
           </p>
         </Reveal>
 
