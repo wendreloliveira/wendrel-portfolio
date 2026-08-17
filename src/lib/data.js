@@ -29,17 +29,17 @@ const emptyMedia = () => ({
   video: null,
 });
 
-// Projetos em destaque — apresentação editorial (estudo de caso completo).
-// layoutVariant controla a composição: "left" (texto à esq./produto à dir.),
-// "right" (produto à esq./texto à dir.) ou "visual" (mídia em maior evidência).
+// Projetos em destaque — todos usam o mesmo ProjectCase (design system
+// único); a identidade de cada um vem dos screenshots, da copy, do status
+// e da stack, não de uma estrutura de layout diferente.
 export const featuredProjects = [
   {
     slug: "empregaai",
     order: 1,
     title: "EmpregaAI",
+    category: "Produto digital",
     tagline:
       "Plataforma inteligente de empregabilidade que conecta pessoas, oportunidades e desenvolvimento profissional.",
-    layoutVariant: "left",
     accent: "blue",
     status: "Em desenvolvimento",
     statusColor: "blue",
@@ -61,9 +61,9 @@ export const featuredProjects = [
       ...emptyMedia(),
       cover: "/projects/empregaai/cover.webp",
       desktop: [
-        { src: "/projects/empregaai/cover.webp", alt: "EmpregaAI — tela principal" },
-        { src: "/projects/empregaai/desktop-para-quem.webp", alt: "EmpregaAI — para quem é a plataforma" },
-        { src: "/projects/empregaai/desktop-onboarding.webp", alt: "EmpregaAI — onboarding do candidato" },
+        { src: "/projects/empregaai/cover.webp", alt: "EmpregaAI — tela principal", caption: "Tela principal" },
+        { src: "/projects/empregaai/desktop-para-quem.webp", alt: "EmpregaAI — para quem é a plataforma", caption: "Para quem é a plataforma" },
+        { src: "/projects/empregaai/desktop-onboarding.webp", alt: "EmpregaAI — onboarding do candidato", caption: "Onboarding do candidato" },
       ],
     },
   },
@@ -71,8 +71,8 @@ export const featuredProjects = [
     slug: "risk",
     order: 2,
     title: "RISK Soluções Empresariais",
+    category: "Projeto empresarial",
     tagline: "Evolução da presença digital de uma empresa real de BPO financeiro, contabilidade e RH.",
-    layoutVariant: "right",
     accent: "violet",
     status: "Entregue",
     statusColor: "violet",
@@ -95,10 +95,10 @@ export const featuredProjects = [
       ...emptyMedia(),
       cover: "/projects/risk/cover.webp",
       desktop: [
-        { src: "/projects/risk/cover.webp", alt: "RISK — página inicial" },
-        { src: "/projects/risk/desktop-servicos.webp", alt: "RISK — serviços" },
-        { src: "/projects/risk/desktop-metodo.webp", alt: "RISK — nosso método" },
-        { src: "/projects/risk/desktop-diagnostico.webp", alt: "RISK — diagnóstico gratuito" },
+        { src: "/projects/risk/cover.webp", alt: "RISK — página inicial", caption: "Página inicial" },
+        { src: "/projects/risk/desktop-servicos.webp", alt: "RISK — serviços", caption: "Serviços" },
+        { src: "/projects/risk/desktop-metodo.webp", alt: "RISK — nosso método", caption: "Nosso método" },
+        { src: "/projects/risk/desktop-diagnostico.webp", alt: "RISK — diagnóstico gratuito", caption: "Diagnóstico gratuito" },
       ],
     },
   },
@@ -106,8 +106,8 @@ export const featuredProjects = [
     slug: "dkastro",
     order: 3,
     title: "D' Kastro Café Bistrô",
+    category: "Frontend & Motion",
     tagline: "Landing page para um café bistrô real em Vassouras — RJ.",
-    layoutVariant: "visual",
     accent: "green",
     status: "Entregue",
     statusColor: "green",
@@ -130,11 +130,11 @@ export const featuredProjects = [
       ...emptyMedia(),
       cover: "/projects/dkastro/cover.webp",
       desktop: [
-        { src: "/projects/dkastro/cover.webp", alt: "D' Kastro — hero" },
-        { src: "/projects/dkastro/desktop-a-casa.webp", alt: "D' Kastro — a casa" },
-        { src: "/projects/dkastro/desktop-pratos.webp", alt: "D' Kastro — pratos executivos" },
-        { src: "/projects/dkastro/desktop-self-service.webp", alt: "D' Kastro — self-service" },
-        { src: "/projects/dkastro/desktop-cta.webp", alt: "D' Kastro — chamada para WhatsApp" },
+        { src: "/projects/dkastro/cover.webp", alt: "D' Kastro — hero", caption: "Hero" },
+        { src: "/projects/dkastro/desktop-a-casa.webp", alt: "D' Kastro — a casa", caption: "A casa" },
+        { src: "/projects/dkastro/desktop-pratos.webp", alt: "D' Kastro — pratos executivos", caption: "Pratos executivos" },
+        { src: "/projects/dkastro/desktop-self-service.webp", alt: "D' Kastro — self-service", caption: "Self-service" },
+        { src: "/projects/dkastro/desktop-cta.webp", alt: "D' Kastro — chamada para WhatsApp", caption: "Chamada para WhatsApp" },
       ],
     },
   },
