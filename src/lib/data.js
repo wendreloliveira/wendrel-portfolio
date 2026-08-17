@@ -54,41 +54,82 @@ export const featuredProjects = [
     ],
     stack: ["Python", "Django", "SQL"],
     links: [],
-    media: emptyMedia(),
+    media: {
+      ...emptyMedia(),
+      cover: "/projects/empregaai/cover.webp",
+      desktop: [
+        "/projects/empregaai/cover.webp",
+        "/projects/empregaai/desktop-para-quem.webp",
+        "/projects/empregaai/desktop-onboarding.webp",
+      ],
+    },
   },
   {
     slug: "risk",
     order: 2,
     title: "RISK Soluções Empresariais",
-    tagline: "Evolução da presença digital de uma empresa real.",
+    tagline: "Evolução da presença digital de uma empresa real de BPO financeiro, contabilidade e RH.",
     layoutVariant: "right",
     accent: "violet",
-    status: null,
+    status: "Entregue",
     statusColor: "violet",
-    context: "",
-    problem: "",
-    role: "",
-    decisions: [],
+    context:
+      "Projeto real para a RISK Soluções Empresariais, evoluindo a presença digital da empresa do zero — identidade visual, conteúdo institucional e um site preparado para crescer com o negócio.",
+    problem:
+      "A empresa precisava de uma presença digital que traduzisse a credibilidade do atendimento presencial para o ambiente online, com um caminho claro para transformar visitantes em contato comercial.",
+    role:
+      "Responsável pelo desenvolvimento do site institucional — estrutura de componentes, implementação da identidade visual, UX, otimização de imagens, SEO e responsividade.",
+    decisions: [
+      "Arquitetura de conteúdo pensada para crescer: cada frente de atuação (BPO Financeiro, Contabilidade, RH, Auditoria, Certificado Digital) isolada como seção própria.",
+      "Fluxo de diagnóstico gratuito como principal caminho de geração de lead, com formulário enxuto e retorno em PDF.",
+      "Paleta e tipografia editoriais (dourado sobre azul-marinho) para transmitir solidez institucional sem parecer um template genérico.",
+    ],
     stack: ["React", "Vite", "Tailwind CSS", "Framer Motion"],
     links: [],
-    media: emptyMedia(),
+    media: {
+      ...emptyMedia(),
+      cover: "/projects/risk/cover.webp",
+      desktop: [
+        "/projects/risk/cover.webp",
+        "/projects/risk/desktop-servicos.webp",
+        "/projects/risk/desktop-metodo.webp",
+        "/projects/risk/desktop-diagnostico.webp",
+      ],
+    },
   },
   {
     slug: "dkastro",
     order: 3,
-    title: "DKastro",
-    tagline: "",
+    title: "D' Kastro Café Bistrô",
+    tagline: "Landing page para um café bistrô real em Vassouras — RJ.",
     layoutVariant: "visual",
     accent: "green",
-    status: null,
+    status: "Entregue",
     statusColor: "green",
-    context: "",
-    problem: "",
-    role: "",
-    decisions: [],
+    context:
+      "D' Kastro é um café bistrô real em Vassouras — RJ, com café, padaria, pratos executivos e self-service no mesmo endereço. A landing page apresenta a casa e direciona o visitante para o WhatsApp.",
+    problem:
+      "O negócio atende públicos diferentes ao longo do dia — do café da manhã ao almoço completo — e precisava de uma experiência digital que refletisse essa variedade sem fragmentar a marca.",
+    role:
+      "Responsável pelo desenvolvimento completo da landing page: estrutura de seções, tipografia editorial, motion de scroll e responsividade.",
+    decisions: [
+      "Tipografia serifada em grande escala para dar peso editorial à marca, fugindo do template genérico de restaurante.",
+      "Seções organizadas por momento de consumo (café, padaria, pratos executivos, self-service) em vez de um cardápio único e extenso.",
+      "WhatsApp como canal principal de conversão, coerente com o funcionamento real do atendimento do bistrô.",
+    ],
     stack: ["Next.js", "TypeScript", "Tailwind CSS", "Framer Motion"],
     links: [],
-    media: emptyMedia(),
+    media: {
+      ...emptyMedia(),
+      cover: "/projects/dkastro/cover.webp",
+      desktop: [
+        "/projects/dkastro/cover.webp",
+        "/projects/dkastro/desktop-a-casa.webp",
+        "/projects/dkastro/desktop-pratos.webp",
+        "/projects/dkastro/desktop-self-service.webp",
+        "/projects/dkastro/desktop-cta.webp",
+      ],
+    },
   },
 ];
 
