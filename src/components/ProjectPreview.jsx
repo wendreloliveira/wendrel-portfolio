@@ -5,13 +5,19 @@ import MediaPlaceholder from "./MediaPlaceholder";
 export default function ProjectPreview({ image, title }) {
   if (image) {
     return (
-      <div className="mb-5 -mx-1 overflow-hidden rounded-xl border border-base-border">
-        <img src={image} alt={`Prévia do projeto ${title}`} className="h-40 w-full object-cover" loading="lazy" />
+      <div className="my-5 overflow-hidden rounded-xl border border-base-border">
+        <img
+          src={image}
+          alt={`Prévia do projeto ${title}`}
+          width={800}
+          height={450}
+          className="aspect-video w-full object-cover object-top"
+          loading="lazy"
+          decoding="async"
+        />
       </div>
     );
   }
 
-  return (
-    <MediaPlaceholder className="mb-5 h-40 w-full" label={`${title} — aguardando mídia`} />
-  );
+  return <MediaPlaceholder className="my-5 aspect-video w-full" label={`${title} — aguardando mídia`} />;
 }

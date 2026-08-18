@@ -18,13 +18,13 @@ export default function App() {
           componente só carregam quando a seção se aproxima da viewport.
           Projects é o candidato mais pesado — rootMargin maior, começa a
           carregar bem antes de entrar na tela. anchorIds cobre os cases
-          individuais (empregaai/risk/dkastro), que só existem no DOM depois
-          que Projects monta — "open empregaai" no Terminal precisa poder
+          individuais e os projetos secundários (só existem no DOM depois
+          que Projects monta) — "open <slug>" no Terminal precisa poder
           acordar essa seção mesmo mirando um id que ainda não existe.
         */}
         <Deferred
           id="projetos"
-          anchorIds={["projetos", "empregaai", "risk", "dkastro"]}
+          anchorIds={["projetos", "empregaai", "risk", "dkastro", "vassvegas", "clinicai", "piemp"]}
           rootMargin="800px 0px"
           minHeightClassName="min-h-[7013px] sm:min-h-[6200px] lg:min-h-[5935px]"
           importer={() => import("./sections/Projects")}
