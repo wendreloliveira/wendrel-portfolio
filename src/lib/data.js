@@ -182,29 +182,34 @@ export const secondaryProjects = [
 
 export const timeline = [
   {
-    year: "2025",
-    title: "Ingresso em Engenharia de Software",
-    description: "Início da graduação na Univassouras, com foco em fundamentos sólidos de lógica, algoritmos e desenvolvimento de software.",
+    tag: "Formação",
+    title: "Engenharia de Software",
+    description: "Início da graduação na Univassouras — fundamentos de lógica, algoritmos e desenvolvimento de software como base para tudo que veio depois.",
   },
   {
-    year: "2025",
-    title: "Hackathon Univassouras",
-    description: "Desenvolvimento do ClinicAI SCA, competindo por um programa de aceleração de R$ 200 mil.",
+    tag: "Hackathon",
+    title: "ClinicAI SCA — Hackathon Univassouras",
+    description: "Protótipo de IA para apoiar a triagem da Síndrome Coronariana Aguda, em equipe, sob pressão de tempo. Participação em um programa ligado a uma oportunidade de aceleração de até R$ 200 mil.",
   },
   {
-    year: "2025",
+    tag: "Pesquisa",
     title: "PIEMP / CNPq",
-    description: "Início do programa de inovação e pesquisa aplicada em IA, automação e dados.",
+    description: "Seis meses de pesquisa aplicada em inteligência artificial, automação e dados.",
   },
   {
-    year: "2025",
+    tag: "Produto multidisciplinar",
     title: "VassVegas Campus",
-    description: "Entrada no time multidisciplinar responsável pelo MVP da plataforma universitária.",
+    description: "Entrada no time multidisciplinar responsável pelo MVP de um ecossistema universitário digital.",
   },
   {
-    year: "2025",
-    title: "Atuação profissional na RISK Empresarial",
-    description: "Aplicação prática de desenvolvimento e automação em ambiente corporativo.",
+    tag: "Produto",
+    title: "EmpregaAI",
+    description: "Desenvolvimento de uma plataforma de empregabilidade em equipe multidisciplinar — da lógica de perfil ao matching entre candidato e oportunidade.",
+  },
+  {
+    tag: "Empresarial",
+    title: "RISK & DKastro",
+    description: "Passagem para projetos reais em contexto comercial: evolução digital de uma empresa de BPO financeiro e a landing page de um negócio local.",
   },
 ];
 

@@ -7,7 +7,7 @@ import avatarWebp from "../assets/avatar.webp";
 const LINKS = [
   { label: "Sobre", href: "#sobre" },
   { label: "Projetos", href: "#projetos" },
-  { label: "Experiências", href: "#timeline" },
+  { label: "Trajetória", href: "#timeline" },
   { label: "Tecnologias", href: "#tecnologias" },
   { label: "Contato", href: "#contato" },
 ];
