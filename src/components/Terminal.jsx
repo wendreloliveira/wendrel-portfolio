@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { technologyGroups, featuredProjects } from "../lib/data";
+import { technologyGroups, technologyRegistry, featuredProjects } from "../lib/data";
 import { forceLoad } from "./Deferred";
 
 const PROMPT = "PS C:\\wendrel>";
@@ -91,7 +91,7 @@ function runCommand(raw) {
     case "stack":
       return technologyGroups.flatMap((group) => [
         group.category.toUpperCase(),
-        `  ${group.items.map((i) => i.name).join(", ")}`,
+        `  ${group.items.map((i) => (i.techId ? technologyRegistry[i.techId]?.name : i.name)).join(", ")}`,
         "",
       ]);
 

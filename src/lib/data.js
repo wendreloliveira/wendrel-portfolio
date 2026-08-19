@@ -30,6 +30,49 @@ const emptyMedia = () => ({
   video: null,
 });
 
+// Registry canônico de tecnologias — uma tecnologia, uma definição. Nome e
+// categoria vivem só aqui; projetos e Technologies referenciam por id, nunca
+// reescrevem o nome. Não colocar aqui descrição de marketing, `usage` por
+// projeto, ícone (react-icons) ou caminho local — só identidade estrutural.
+// IDs vêm exclusivamente da auditoria comprovada por repositório real; não
+// existe entrada aqui sem evidência (por isso não há `django`).
+export const technologyRegistry = {
+  react: { id: "react", name: "React", category: "frontend" },
+  nextjs: { id: "nextjs", name: "Next.js", category: "frontend" },
+  typescript: { id: "typescript", name: "TypeScript", category: "frontend" },
+  tailwindcss: { id: "tailwindcss", name: "Tailwind CSS", category: "frontend" },
+  framermotion: { id: "framermotion", name: "Framer Motion", category: "frontend" },
+  threejs: { id: "threejs", name: "Three.js", category: "frontend" },
+  r3f: { id: "r3f", name: "React Three Fiber", category: "frontend" },
+  drei: { id: "drei", name: "Drei", category: "frontend" },
+  reactrouter: { id: "reactrouter", name: "React Router", category: "frontend" },
+  tanstackstart: { id: "tanstackstart", name: "TanStack Start", category: "frontend" },
+  tanstackrouter: { id: "tanstackrouter", name: "TanStack Router", category: "frontend" },
+  tanstackquery: { id: "tanstackquery", name: "TanStack Query", category: "frontend" },
+  shadcnui: { id: "shadcnui", name: "shadcn/ui", category: "frontend" },
+  radix: { id: "radix", name: "Radix UI", category: "frontend" },
+  python: { id: "python", name: "Python", category: "backend" },
+  flask: { id: "flask", name: "Flask", category: "backend" },
+  sqlalchemy: { id: "sqlalchemy", name: "SQLAlchemy", category: "data" },
+  postgresql: { id: "postgresql", name: "PostgreSQL", category: "data" },
+  alembic: { id: "alembic", name: "Alembic", category: "data" },
+  supabase: { id: "supabase", name: "Supabase", category: "data" },
+  pytest: { id: "pytest", name: "pytest", category: "quality" },
+  gunicorn: { id: "gunicorn", name: "Gunicorn", category: "infra" },
+  cloudflareworkers: { id: "cloudflareworkers", name: "Cloudflare Workers", category: "infra" },
+  vite: { id: "vite", name: "Vite", category: "tooling" },
+  git: { id: "git", name: "Git", category: "tooling" },
+  github: { id: "github", name: "GitHub", category: "tooling" },
+};
+
+// Sustenta a camada de compatibilidade: resolve ids em nomes de exibição, na
+// ordem dada. `stack` (consumida hoje por ProjectCase/SecondaryProjectCard)
+// continua sendo um array de strings, só que derivado do registry — nunca
+// mais digitado à mão.
+function resolveTechNames(ids) {
+  return ids.map((id) => technologyRegistry[id]?.name).filter(Boolean);
+}
+
 // Projetos em destaque — todos usam o mesmo ProjectCase (design system
 // único); a identidade de cada um vem dos screenshots, da copy, do status
 // e da stack, não de uma estrutura de layout diferente.
@@ -55,7 +98,14 @@ export const featuredProjects = [
       "Onboarding do candidato pensado para capturar habilidades reais, não apenas cargos anteriores.",
       "Arquitetura pensada para evoluir de matching por regras para recomendação mais sofisticada sem reescrever a base de dados.",
     ],
-    stack: ["Python", "Flask", "React", "PostgreSQL"],
+    primaryTechIds: ["python", "flask", "react", "postgresql"],
+    techGroups: [
+      { label: "Frontend", ids: ["react", "typescript", "vite", "reactrouter"] },
+      { label: "Backend", ids: ["python", "flask"] },
+      { label: "Dados", ids: ["postgresql", "sqlalchemy"] },
+      { label: "Qualidade", ids: ["pytest"] },
+      { label: "Infra", ids: ["gunicorn"] },
+    ],
     liveUrl: "https://emprega-ai-wheat.vercel.app/",
     links: [],
     media: {
@@ -89,7 +139,20 @@ export const featuredProjects = [
       "Integridade de carrinho, pedido e estoque: controle transacional, proteção contra duplicação de pedido e proteção contra alteração do carrinho após a revisão.",
       "Persistência e publicação: PostgreSQL persistente no Neon, migrações com Alembic e deploy público no Render.",
     ],
-    stack: ["Python", "Flask", "PostgreSQL", "SQLAlchemy", "pytest"],
+    primaryTechIds: ["python", "flask", "postgresql", "sqlalchemy", "pytest"],
+    techGroups: [
+      // Jinja vem junto do Flask (não é uma dependência own própria) —
+      // real, mas sem peso de nó global; fica como item local.
+      { label: "Aplicação", ids: ["python", "flask"], items: ["Jinja"] },
+      { label: "Dados", ids: ["postgresql", "sqlalchemy", "alembic"] },
+      // Flask-Login/Flask-WTF: extensões do Flask, não tecnologias
+      // separadas com identidade própria no grafo — locais.
+      { label: "Auth / Web", items: ["Flask-Login", "Flask-WTF"] },
+      { label: "Qualidade", ids: ["pytest"] },
+      // Neon/Render são provedores de hosting, não tecnologias de código —
+      // reais e confirmados (config.py/render.yaml), mas locais.
+      { label: "Infra", ids: ["gunicorn"], items: ["Neon", "Render"] },
+    ],
     liveUrl: "https://naboa-streetwear.onrender.com/",
     liveCtaLabel: "Ver projeto ao vivo",
     livePreview: {
@@ -130,7 +193,13 @@ export const featuredProjects = [
       "Fluxo de diagnóstico gratuito como principal caminho de geração de lead, com formulário enxuto e retorno em PDF.",
       "Paleta e tipografia editoriais (dourado sobre azul-marinho) para transmitir solidez institucional sem parecer um template genérico.",
     ],
-    stack: ["React", "Vite", "Tailwind CSS", "Framer Motion"],
+    primaryTechIds: ["react", "vite", "tailwindcss", "framermotion"],
+    techGroups: [
+      { label: "Frontend", ids: ["react", "vite", "tailwindcss", "framermotion", "reactrouter"] },
+      // jsPDF/Recharts: reais, mas não úteis como nó global do Tech ↔
+      // Project Graph — ficam locais em vez de virar registry entry.
+      { label: "Bibliotecas", items: ["jsPDF", "Recharts"] },
+    ],
     liveUrl: "https://risk-platform-b11.pages.dev/",
     liveCtaLabel: "Explorar projeto",
     links: [],
@@ -165,7 +234,11 @@ export const featuredProjects = [
       "Seções organizadas por momento de consumo (café, padaria, pratos executivos, self-service) em vez de um cardápio único e extenso.",
       "WhatsApp como canal principal de conversão, coerente com o funcionamento real do atendimento do bistrô.",
     ],
-    stack: ["Next.js", "TypeScript", "Tailwind CSS", "Framer Motion"],
+    primaryTechIds: ["nextjs", "typescript", "tailwindcss", "framermotion"],
+    techGroups: [
+      { label: "Aplicação", ids: ["nextjs", "typescript", "tailwindcss", "framermotion"] },
+      { label: "3D", ids: ["threejs", "r3f", "drei"] },
+    ],
     liveUrl: "https://dkastro-landing.vercel.app/",
     liveCtaLabel: "Experiência ao vivo",
     links: [],
@@ -181,7 +254,13 @@ export const featuredProjects = [
       ],
     },
   },
-];
+  // `stack` (compatibilidade com ProjectCase) é derivada logo abaixo, a
+  // partir de primaryTechIds — nenhum projeto acima digita nome de
+  // tecnologia à mão.
+].map((project) => ({
+  ...project,
+  stack: project.stack ?? resolveTechNames(project.primaryTechIds),
+}));
 
 // Outros projetos & experiências — apresentação compacta, sem estudo de caso completo.
 export const secondaryProjects = [
@@ -193,7 +272,13 @@ export const secondaryProjects = [
     tagline:
       "Ecossistema digital que conecta estudantes, atléticas, repúblicas, empresas e parceiros de Vassouras em um único lugar — eventos, oportunidades, networking e banco de talentos.",
     role: "Atuo no desenvolvimento do MVP e nas decisões de produto, dentro de uma equipe multidisciplinar (desenvolvimento, marketing e gestão).",
-    stack: ["React", "TypeScript", "Supabase", "Tailwind CSS"],
+    primaryTechIds: ["react", "typescript", "supabase", "tailwindcss"],
+    techGroups: [
+      { label: "Aplicação", ids: ["react", "typescript", "tanstackstart", "tanstackrouter", "tanstackquery"] },
+      { label: "UI", ids: ["tailwindcss", "shadcnui", "radix"] },
+      { label: "Dados", ids: ["supabase"] },
+      { label: "Infra", ids: ["cloudflareworkers"] },
+    ],
     links: [],
     media: {
       ...emptyMedia(),
@@ -209,6 +294,12 @@ export const secondaryProjects = [
       "Protótipo de IA desenvolvido em equipe durante o Hackathon Univassouras, explorando o apoio à triagem da Síndrome Coronariana Aguda.",
     role:
       "Participei da equipe de prototipação, da definição da lógica do problema à primeira versão funcional, dentro do tempo limitado do hackathon.",
+    // Exceção documentada: "IA" é um rótulo editorial, não uma tecnologia
+    // canônica — não há implementação técnica comprovada por trás dele
+    // (nenhum framework/lib de IA confirmado por repositório real). `stack`
+    // fica literal para preservar a copy atual; primaryTechIds só registra
+    // o que é de fato comprovado (Python), para consultas futuras do grafo.
+    primaryTechIds: ["python"],
     stack: ["Python", "IA"],
     links: [],
     media: {
@@ -218,7 +309,10 @@ export const secondaryProjects = [
         "Desenvolvimento do protótipo ClinicAI SCA durante o Hackathon Univassouras — mãos digitando com a interface do sistema aberta na tela do notebook.",
     },
   },
-];
+].map((project) => ({
+  ...project,
+  stack: project.stack ?? resolveTechNames(project.primaryTechIds),
+}));
 
 export const timeline = [
   {
@@ -248,40 +342,46 @@ export const timeline = [
   },
 ];
 
+// Nome e categoria vêm do technologyRegistry por `techId` — `usage` é a
+// única camada editorial própria desta seção, então nenhuma tecnologia tem
+// `name: "Flask"` (ou similar) escrito em duas fontes diferentes.
+// "SQL" é a única exceção: é um rótulo genérico do contexto PIEMP sem uma
+// tecnologia canônica específica confirmada por trás, então fica fora do
+// registry e usa `name` literal em vez de `techId`.
 export const technologyGroups = [
   {
     category: "Front-end",
     items: [
-      { name: "React", usage: "Usado no RISK, no VassVegas Campus e neste portfólio." },
-      { name: "Next.js", usage: "Usado no DKastro." },
-      { name: "TypeScript", usage: "Usado no DKastro e no VassVegas Campus." },
-      { name: "Tailwind CSS", usage: "Usado no RISK, DKastro, VassVegas Campus e neste portfólio." },
-      { name: "Framer Motion", usage: "Usado no RISK, DKastro e neste portfólio." },
+      { techId: "react", usage: "Usado no RISK, no VassVegas Campus e neste portfólio." },
+      { techId: "nextjs", usage: "Usado no DKastro." },
+      { techId: "typescript", usage: "Usado no DKastro e no VassVegas Campus." },
+      { techId: "tailwindcss", usage: "Usado no RISK, DKastro, VassVegas Campus e neste portfólio." },
+      { techId: "framermotion", usage: "Usado no RISK, DKastro e neste portfólio." },
     ],
   },
   {
     category: "Back-end",
     items: [
-      { name: "Python", usage: "Usado em APIs, automação e lógica de aplicações no EmpregaAI e no PIEMP." },
-      { name: "Flask", usage: "Backend e regras de negócio das aplicações da NABOA e do EmpregaAI." },
-      { name: "SQLAlchemy", usage: "ORM e modelagem do banco relacional da NABOA." },
+      { techId: "python", usage: "Usado em APIs, automação e lógica de aplicações no EmpregaAI e no PIEMP." },
+      { techId: "flask", usage: "Backend e regras de negócio das aplicações da NABOA e do EmpregaAI." },
+      { techId: "sqlalchemy", usage: "ORM e modelagem do banco relacional da NABOA." },
     ],
   },
   {
     category: "Dados",
     items: [
-      { name: "Supabase", usage: "Autenticação, banco de dados e storage do VassVegas Campus." },
-      { name: "PostgreSQL", usage: "Banco relacional de produção da NABOA, hospedado no Neon, com migrações via Alembic." },
+      { techId: "supabase", usage: "Autenticação, banco de dados e storage do VassVegas Campus." },
+      { techId: "postgresql", usage: "Banco relacional de produção da NABOA, hospedado no Neon, com migrações via Alembic." },
       { name: "SQL", usage: "Modelagem de dados em projetos como PIEMP e EmpregaAI." },
     ],
   },
   {
     category: "Ferramentas",
     items: [
-      { name: "Git", usage: "Versionamento em todos os projetos." },
-      { name: "GitHub", usage: "Colaboração e histórico de código em equipe." },
-      { name: "Vite", usage: "Build tool do RISK e deste portfólio." },
-      { name: "pytest", usage: "291 testes automatizados no backend da NABOA." },
+      { techId: "git", usage: "Versionamento em todos os projetos." },
+      { techId: "github", usage: "Colaboração e histórico de código em equipe." },
+      { techId: "vite", usage: "Build tool do RISK e deste portfólio." },
+      { techId: "pytest", usage: "291 testes automatizados no backend da NABOA." },
     ],
   },
 ];

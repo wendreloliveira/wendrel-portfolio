@@ -1,24 +1,23 @@
-import { SiPython, SiReact, SiTypescript, SiNextdotjs, SiFramer, SiDjango, SiFlask, SiGit, SiGithub, SiTailwindcss, SiSupabase, SiVite, SiPostgresql, SiSqlalchemy, SiPytest } from "react-icons/si";
+import { SiPython, SiReact, SiTypescript, SiNextdotjs, SiFramer, SiFlask, SiGit, SiGithub, SiTailwindcss, SiSupabase, SiVite, SiPostgresql, SiSqlalchemy, SiPytest } from "react-icons/si";
 import Reveal from "../components/Reveal";
-import { technologyGroups } from "../lib/data";
+import { technologyGroups, technologyRegistry } from "../lib/data";
 
-// Ícone é só apoio visual do nome — não existe entrada aqui sem uma linha
-// de uso correspondente em technologyGroups (src/lib/data.js).
+// Ícone é só apoio visual, mapeado por techId — não existe entrada aqui sem
+// uma linha de uso correspondente em technologyGroups (src/lib/data.js).
 const ICONS = {
-  React: SiReact,
-  "Next.js": SiNextdotjs,
-  TypeScript: SiTypescript,
-  "Tailwind CSS": SiTailwindcss,
-  "Framer Motion": SiFramer,
-  Python: SiPython,
-  Django: SiDjango,
-  Flask: SiFlask,
-  SQLAlchemy: SiSqlalchemy,
-  Supabase: SiSupabase,
-  PostgreSQL: SiPostgresql,
-  Git: SiGit,
-  GitHub: SiGithub,
-  Vite: SiVite,
+  react: SiReact,
+  nextjs: SiNextdotjs,
+  typescript: SiTypescript,
+  tailwindcss: SiTailwindcss,
+  framermotion: SiFramer,
+  python: SiPython,
+  flask: SiFlask,
+  sqlalchemy: SiSqlalchemy,
+  supabase: SiSupabase,
+  postgresql: SiPostgresql,
+  git: SiGit,
+  github: SiGithub,
+  vite: SiVite,
   pytest: SiPytest,
 };
 
@@ -47,16 +46,19 @@ export default function Technologies() {
                 <h3 className="font-mono text-xs uppercase tracking-widest text-signal-blue">{group.category}</h3>
                 <div className="mt-4 flex flex-col gap-4">
                   {group.items.map((item) => {
-                    const Icon = ICONS[item.name];
+                    // Nome vem do registry quando há techId; "SQL" (sem
+                    // tecnologia canônica confirmada) usa o `name` literal.
+                    const name = item.techId ? technologyRegistry[item.techId]?.name : item.name;
+                    const Icon = item.techId ? ICONS[item.techId] : null;
                     return (
-                      <div key={item.name} className="flex items-start gap-3">
+                      <div key={item.techId ?? item.name} className="flex items-start gap-3">
                         {Icon ? (
                           <Icon size={18} className="mt-0.5 shrink-0 text-ink-faint" />
                         ) : (
                           <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-ink-faint" />
                         )}
                         <div>
-                          <p className="text-sm font-medium text-ink">{item.name}</p>
+                          <p className="text-sm font-medium text-ink">{name}</p>
                           <p className="mt-0.5 text-sm leading-relaxed text-ink-muted">{item.usage}</p>
                         </div>
                       </div>
