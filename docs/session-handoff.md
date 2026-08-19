@@ -4,12 +4,12 @@ _Última atualização: 2026-08-19 · gerado automaticamente ao fim de uma sess�
 
 ## Estado atual
 
-- **Branch:** `feat/portfolio-real-projects`
-- **HEAD:** `4609cfa` — `feat(seo): add portfolio social preview`
-- **Working tree:** limpo, nada pendente. Nenhum push feito ainda.
+- **Branch:** `main` (deployed — `feat/portfolio-real-projects` foi consolidada aqui via fast-forward)
+- **Production URL:** https://wendrel-portfolio.vercel.app
+- **Working tree:** limpo, nada pendente.
 - **Build:** `npm run build` limpo (Vite 8, 452 módulos). `npm run lint` (oxlint): só o warning pré-existente de `Deferred.jsx` (fast-refresh, não relacionado ao conteúdo).
 - **Arquitetura:** todo o conteúdo dos projetos vive em [`src/lib/data.js`](../src/lib/data.js) (fonte única). Componentes (`ProjectCase`, `ProjectMediaViewer`, `LivePreviewModal`) são genéricos — a identidade de cada case vem só dos dados, nunca de variantes de componente por projeto.
-- **Sprint final de conteúdo concluída.** Próximo passo é deploy — nenhuma alteração de conteúdo/produto/performance pendente.
+- **Deployed.** Sem pendência de conteúdo, produto, performance ou SEO.
 
 ## Stack
 
@@ -46,8 +46,7 @@ Reflete agora a stack comprovada pela NABOA: `Flask` (usage aponta para a NABOA 
 ## SEO / Open Graph
 
 - `public/og-image.png` — 1200×630, 284 KB, composição própria (não é screenshot de projeto): grid + glow azul/violeta iguais ao Hero, foto do Hero com o mesmo tratamento de fade/vignette do card original, "Wendrel Oliveira" + "Engenharia de Software & Produtos Digitais" + a mesma linha que o `whoami` do Terminal já usa.
-- `index.html` tem `og:image`/`og:image:width`/`og:image:height`/`twitter:image` apontando para `/og-image.png` (URL **relativa** — não há domínio final decidido ainda, ver `README.md`).
-- **Pendência real:** trocar para URL absoluta assim que o domínio de deploy for escolhido — várias plataformas não resolvem `og:image` relativo de forma confiável.
+- `index.html` tem `canonical`, `og:url`, `og:image`/`og:image:width`/`og:image:height` e `twitter:image` apontando para URLs **absolutas** em `https://wendrel-portfolio.vercel.app/` — finalizado nesta microfase, nenhuma pendência.
 
 ## Performance
 
@@ -60,4 +59,4 @@ Registro breve — não alterar sem evidência (Lighthouse) de que algo regrediu
 
 ## Próxima fase
 
-**Deploy.** Sem pendência de conteúdo, produto ou performance. Único item real: converter `og:image`/`twitter:image` para URL absoluta assim que o domínio for definido (ver seção SEO acima).
+Nenhuma pendência aberta. Deployed em https://wendrel-portfolio.vercel.app, com metadados de produção finalizados.
