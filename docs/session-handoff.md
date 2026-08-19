@@ -76,6 +76,17 @@ Branches de diagnóstico preservadas (não deletar ainda): `diag/mobile-paint-st
 - sem blur/filter/listener global/RAF;
 - limitação conhecida: secondary projects sem elemento focável ainda não possuem trigger Project → Technology por teclado.
 
+## V2.3 — Inspect Mode
+
+- toggle `</> Inspect` na Navbar (desktop + menu mobile);
+- Hero technical annotations;
+- Detailed Stack via Data Truth Layer, acordeão único por projeto (`openProjectId` no `InspectProvider`);
+- Technologies mostra projetos relacionados por tecnologia;
+- Engineering Note do Safari/iOS (paint stall no grid, crash de pinch-zoom no glow da foto — causas distintas);
+- ClinicAI sem detalhamento inventado;
+- Inspect e Tech ↔ Project Graph coexistem sem interferência;
+- mobile progressive enhancement, sem dependência nova.
+
 ## Próxima fase
 
 Nenhuma pendência aberta. Deployed em https://wendrel-portfolio.vercel.app, com metadados de produção finalizados e os dois bugs de mobile Safari corrigidos.
