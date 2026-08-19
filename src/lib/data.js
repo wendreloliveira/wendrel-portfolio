@@ -92,6 +92,13 @@ export const featuredProjects = [
     stack: ["Python", "Flask", "PostgreSQL", "SQLAlchemy", "pytest"],
     liveUrl: "https://naboa-streetwear.onrender.com/",
     liveCtaLabel: "Ver projeto ao vivo",
+    livePreview: {
+      coldStartNotice: {
+        title: "Iniciando a demo da NABOA",
+        message:
+          "A aplicação está hospedada no plano gratuito do Render e pode levar alguns segundos para iniciar após um período sem acesso.",
+      },
+    },
     links: [],
     media: {
       ...emptyMedia(),

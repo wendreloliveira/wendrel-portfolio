@@ -108,6 +108,7 @@ export default function ProjectCase({ project, index }) {
     links,
     liveUrl,
     liveCtaLabel,
+    livePreview,
   } = project;
   const images = project.media?.desktop || [];
   const viewerRef = useRef(null);
@@ -243,7 +244,13 @@ export default function ProjectCase({ project, index }) {
 
         {hasOpenedPreview && (
           <Suspense fallback={null}>
-            <LivePreviewModal open={previewOpen} onClose={() => setPreviewOpen(false)} url={liveUrl} title={title} />
+            <LivePreviewModal
+              open={previewOpen}
+              onClose={() => setPreviewOpen(false)}
+              url={liveUrl}
+              title={title}
+              coldStartNotice={livePreview?.coldStartNotice}
+            />
           </Suspense>
         )}
       </article>

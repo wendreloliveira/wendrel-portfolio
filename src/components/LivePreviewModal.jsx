@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { HiOutlineExternalLink, HiX } from "react-icons/hi";
@@ -6,9 +6,22 @@ import { HiOutlineExternalLink, HiX } from "react-icons/hi";
 // Modal grande que só monta o iframe do deploy quando o visitante pede —
 // nunca no carregamento inicial, e nunca mais de um por vez (é montado sob
 // demanda e desmontado ao fechar, então o iframe realmente descarrega).
-export default function LivePreviewModal({ open, onClose, url, title }) {
+//
+// coldStartNotice (opcional, vem dos dados do projeto) é só um aviso
+// honesto — não existe forma confiável de detectar se o app já "acordou"
+// de dentro de um iframe cross-origin (o evento load do iframe dispara até
+// pra própria página de "waking up" do host), então não tentamos simular
+// isso. É um texto dispensável manualmente, nada mais.
+export default function LivePreviewModal({ open, onClose, url, title, coldStartNotice }) {
   const closeButtonRef = useRef(null);
   const triggerRef = useRef(null);
+  const [noticeDismissed, setNoticeDismissed] = useState(false);
+
+  // Reaparece a cada abertura — o risco de cold start existe de novo toda
+  // vez que o preview é reaberto depois de um tempo ocioso.
+  useEffect(() => {
+    if (open) setNoticeDismissed(false);
+  }, [open]);
 
   // Foco: guarda quem abriu o modal para devolver o foco a ele ao fechar,
   // e manda o foco pro botão de fechar assim que o modal aparece.
@@ -78,6 +91,24 @@ export default function LivePreviewModal({ open, onClose, url, title }) {
                 </button>
               </div>
             </div>
+
+            {coldStartNotice && !noticeDismissed && (
+              <div className="flex items-start gap-3 border-b border-base-border bg-base-elevated/60 px-4 py-2.5">
+                <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-amber-400" aria-hidden="true" />
+                <div className="flex-1 text-xs">
+                  <p className="font-medium text-ink">{coldStartNotice.title}</p>
+                  <p className="mt-0.5 text-ink-muted">{coldStartNotice.message}</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setNoticeDismissed(true)}
+                  aria-label="Dispensar aviso"
+                  className="shrink-0 text-ink-faint transition-colors hover:text-ink"
+                >
+                  <HiX size={14} />
+                </button>
+              </div>
+            )}
 
             <div className="min-h-0 flex-1 bg-white">
               {/* O iframe só existe enquanto o modal está aberto — desmonta ao fechar. */}
