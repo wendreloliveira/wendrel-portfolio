@@ -119,7 +119,11 @@ export default function Hero() {
             transition={{ duration: 0.8, delay: 0.25, ease: [0.16, 1, 0.3, 1] }}
             className="relative mx-auto w-full max-w-xs md:max-w-none"
           >
-            <div aria-hidden="true" className="absolute -inset-6 -z-10 rounded-[2.5rem] bg-grad-signal opacity-[0.15] blur-3xl" />
+            {/* blur só a partir de lg (1024px): abaixo disso, filter:blur(64px)
+                nesta camada — dentro do contexto 3D do card pai — travava o
+                Safari/iOS ao dar pinch-zoom sobre a foto (confirmado por A/B
+                em dispositivo real; o 3D sozinho não causa o crash). */}
+            <div aria-hidden="true" className="absolute -inset-6 -z-10 rounded-[2.5rem] bg-grad-signal opacity-[0.15] lg:blur-3xl" />
             <div className="relative overflow-hidden rounded-3xl border border-base-border">
               {/*
                 A imagem já vem recortada exatamente em 4:5 (mesma proporção do
