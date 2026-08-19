@@ -36,7 +36,7 @@ const emptyMedia = () => ({
 export const featuredProjects = [
   {
     slug: "empregaai",
-    order: 1,
+    order: 4,
     title: "EmpregaAI",
     category: "Produto digital",
     tagline:
@@ -105,7 +105,7 @@ export const featuredProjects = [
   },
   {
     slug: "risk",
-    order: 3,
+    order: 1,
     title: "RISK Soluções Empresariais",
     category: "Projeto empresarial",
     tagline: "Evolução da presença digital de uma empresa real de BPO financeiro, contabilidade e RH.",
@@ -140,7 +140,7 @@ export const featuredProjects = [
   },
   {
     slug: "dkastro",
-    order: 4,
+    order: 3,
     title: "D' Kastro Café Bistrô",
     category: "Frontend & Motion",
     tagline: "Landing page para um café bistrô real em Vassouras — RJ.",

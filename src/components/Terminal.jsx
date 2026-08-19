@@ -10,13 +10,20 @@ function liveUrlOf(slug) {
   return featuredProjects.find((p) => p.slug === slug)?.liveUrl;
 }
 
+// Mesma ordem da seção Projects (ver "order" em featuredProjects) — mantém
+// a numeração do comando "projects" consistente com o que a pessoa vê na página.
 const OPENABLE = [
-  { slug: "empregaai", label: "EmpregaAI", type: "produto / software", liveUrl: liveUrlOf("empregaai") },
-  { slug: "naboa", label: "NABOA Streetwear", type: "e-commerce / full stack", liveUrl: liveUrlOf("naboa") },
   { slug: "risk", label: "RISK", type: "projeto empresarial", liveUrl: liveUrlOf("risk") },
+  { slug: "naboa", label: "NABOA Streetwear", type: "e-commerce / full stack", liveUrl: liveUrlOf("naboa") },
   { slug: "dkastro", label: "DKastro", type: "frontend / motion", liveUrl: liveUrlOf("dkastro") },
+  { slug: "empregaai", label: "EmpregaAI", type: "produto / software", liveUrl: liveUrlOf("empregaai") },
   { slug: "vassvegas", label: "VassVegas", type: "produto multidisciplinar" },
 ];
+
+// Largura da coluna do comando "projects" — calculada a partir do maior
+// label, não fixa, pra não quebrar de novo quando um nome mais comprido
+// (tipo "NABOA Streetwear") entrar na lista.
+const maxLabelLength = Math.max(...OPENABLE.map((p) => p.label.length));
 
 const HELP_LINES = [
   "help              lista os comandos",
@@ -24,8 +31,8 @@ const HELP_LINES = [
   "about             resumo profissional",
   "projects          projetos reais",
   "stack             tecnologias por uso real",
-  "open <projeto>    abre um case (empregaai, naboa, risk, dkastro, vassvegas)",
-  "visit <projeto>   abre o MVP publicado em nova aba (empregaai, naboa, risk, dkastro)",
+  "open <projeto>    abre um case (risk, naboa, dkastro, empregaai, vassvegas)",
+  "visit <projeto>   abre o MVP publicado em nova aba (risk, naboa, dkastro, empregaai)",
   "contact           vai até o contato",
   "clear             limpa o terminal",
 ];
@@ -76,7 +83,7 @@ function runCommand(raw) {
 
     case "projects":
       return [
-        ...OPENABLE.map((p, i) => `${String(i + 1).padStart(2, "0")}  ${p.label.padEnd(14)}${p.type}`),
+        ...OPENABLE.map((p, i) => `${String(i + 1).padStart(2, "0")}  ${p.label.padEnd(maxLabelLength + 2)}${p.type}`),
         "",
         "digite 'open <projeto>' para ver o case (ex: open empregaai)",
       ];
@@ -97,7 +104,7 @@ function runCommand(raw) {
       if (!target) {
         return [
           `projeto não encontrado: ${args[0] || ""}`,
-          "use: open empregaai | naboa | risk | dkastro | vassvegas",
+          "use: open risk | naboa | dkastro | empregaai | vassvegas",
         ];
       }
       goToSection(target.slug);
@@ -109,7 +116,7 @@ function runCommand(raw) {
       if (!target || !target.liveUrl) {
         return [
           `MVP não encontrado: ${args[0] || ""}`,
-          "use: visit empregaai | naboa | risk | dkastro",
+          "use: visit risk | naboa | dkastro | empregaai",
         ];
       }
       window.open(target.liveUrl, "_blank", "noopener,noreferrer");
