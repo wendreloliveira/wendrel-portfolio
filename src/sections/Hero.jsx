@@ -1,14 +1,30 @@
 import { useRef } from "react";
-import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
+import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { HiArrowRight } from "react-icons/hi";
 import GridBackground from "../components/GridBackground";
 import Terminal from "../components/Terminal";
-import { profile } from "../lib/data";
+import { profile, portfolioInspectNotes, technologyRegistry } from "../lib/data";
+import { useInspect } from "../context/inspectState";
 import MagneticButton from "../components/MagneticButton";
 import heroPhotoAvif from "../assets/hero-photo.avif";
 import heroPhotoWebp from "../assets/hero-photo.webp";
 
+// Linhas do painel Inspect do Hero — só fatos confirmados no código atual
+// (ver comentários no GridBackground.jsx e mais abaixo, no glow da foto).
+// stack vem do technologyRegistry (nunca digitado à mão); o resto é texto
+// fixo porque descreve comportamento de código, não dado de projeto.
+function heroInspectLines(notes) {
+  const stack = notes.stackTechIds.map((id) => technologyRegistry[id]?.name).join(" · ");
+  return [
+    { label: "STACK", value: stack },
+    { label: "MEDIA", value: notes.media },
+    { label: "MOBILE", value: notes.mobileGrid },
+    { label: "PHOTO", value: notes.photoGlow },
+  ];
+}
+
 export default function Hero() {
+  const { inspectMode } = useInspect();
   const ref = useRef(null);
   const mx = useMotionValue(0);
   const my = useMotionValue(0);
@@ -165,6 +181,31 @@ export default function Hero() {
         >
           <Terminal />
         </motion.div>
+
+        {/* Camada técnica opcional — só existe quando Inspect está ligado
+            (Navbar). Sem blur/filter, só opacity + translate curto. */}
+        <AnimatePresence initial={false}>
+          {inspectMode && (
+            <motion.div
+              key="hero-inspect"
+              initial={{ opacity: 0, y: -6 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -6 }}
+              transition={{ duration: 0.18 }}
+              className="mx-auto mt-6 max-w-2xl rounded-xl border border-base-border bg-base-surface/40 p-4 font-mono text-[11px] text-ink-muted"
+            >
+              <p className="text-[10px] uppercase tracking-widest text-signal-blue">[ hero ]</p>
+              <dl className="mt-2 flex flex-col gap-1.5">
+                {heroInspectLines(portfolioInspectNotes.hero).map((line) => (
+                  <div key={line.label} className="flex flex-wrap gap-x-2">
+                    <dt className="shrink-0 text-ink-faint">{line.label}</dt>
+                    <dd>{line.value}</dd>
+                  </div>
+                ))}
+              </dl>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </section>
   );

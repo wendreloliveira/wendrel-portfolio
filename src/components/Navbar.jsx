@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { HiOutlineMenu, HiX } from "react-icons/hi";
 import avatarAvif from "../assets/avatar.avif";
 import avatarWebp from "../assets/avatar.webp";
+import { useInspect } from "../context/inspectState";
 
 const LINKS = [
   { label: "Sobre", href: "#sobre" },
@@ -11,6 +12,29 @@ const LINKS = [
   { label: "Tecnologias", href: "#tecnologias" },
   { label: "Contato", href: "#contato" },
 ];
+
+// Chip pequeno, mesmo em desktop e no menu mobile — "abrir o capô", não
+// "ligar um painel de debug". aria-pressed carrega o estado pra leitor de
+// tela; o dot + cor carregam pra quem enxerga.
+function InspectToggle({ className = "" }) {
+  const { inspectMode, toggleInspect } = useInspect();
+  return (
+    <button
+      type="button"
+      onClick={toggleInspect}
+      aria-pressed={inspectMode}
+      className={`inline-flex items-center gap-1.5 rounded-full border px-3.5 py-2 font-mono text-xs transition-colors duration-150 ${
+        inspectMode
+          ? "border-signal-blue/50 bg-signal-blue/10 text-signal-blue"
+          : "border-base-border text-ink-muted hover:border-ink-faint hover:text-ink"
+      } ${className}`}
+    >
+      <span aria-hidden="true">{"</>"}</span>
+      Inspect
+      {inspectMode && <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-signal-blue" />}
+    </button>
+  );
+}
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
@@ -61,7 +85,8 @@ export default function Navbar() {
           ))}
         </nav>
 
-        <div className="hidden md:block">
+        <div className="hidden items-center gap-3 md:flex">
+          <InspectToggle />
           <a
             href="#contato"
             className="rounded-full border border-base-border bg-base-elevated px-4 py-2 text-sm font-medium text-ink transition-all hover:border-signal-blue/50 hover:bg-base-elevated/80"
@@ -100,6 +125,9 @@ export default function Navbar() {
                   {link.label}
                 </a>
               ))}
+              <div className="mt-2 px-3">
+                <InspectToggle />
+              </div>
             </div>
           </motion.div>
         )}

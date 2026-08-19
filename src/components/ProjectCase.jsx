@@ -3,6 +3,7 @@ import { HiChevronLeft, HiChevronRight, HiOutlineExternalLink, HiOutlinePlay } f
 import Reveal from "./Reveal";
 import MediaPlaceholder from "./MediaPlaceholder";
 import ProjectMediaViewer from "./ProjectMediaViewer";
+import TechStackInspect from "./TechStackInspect";
 import { useTechGraph, hasFineHover, relationState } from "../context/graphState";
 
 // Import dinâmico de verdade: o código do modal (portal, foco, iframe) só é
@@ -258,6 +259,7 @@ export default function ProjectCase({ project, index }) {
                   <Tag key={tech}>{tech}</Tag>
                 ))}
               </div>
+              <TechStackInspect project={project} />
             </div>
           )}
 

@@ -316,11 +316,48 @@ export const secondaryProjects = [
 
 // Tech ↔ Project Graph: única forma de perguntar "quais projetos usam X" —
 // nenhum componente deve comparar nomes de tecnologia ou manter um mapa à parte.
-export function getProjectSlugsByTechId(techId) {
-  return [...featuredProjects, ...secondaryProjects]
-    .filter((project) => project.primaryTechIds?.includes(techId))
-    .map((project) => project.slug);
+function projectsUsingTech(techId) {
+  return [...featuredProjects, ...secondaryProjects].filter((project) => project.primaryTechIds?.includes(techId));
 }
+
+export function getProjectSlugsByTechId(techId) {
+  return projectsUsingTech(techId).map((project) => project.slug);
+}
+
+// Mesma relação, mas em nome de exibição — usado pelo Inspect Mode pra
+// anotar "Projetos: X · Y" ao lado de uma tecnologia sem reimplementar o filtro.
+export function getProjectTitlesByTechId(techId) {
+  return projectsUsingTech(techId).map((project) => project.title);
+}
+
+// Resolve techGroups (ids do registry + items locais) numa forma pronta pra
+// render: [{ label, technologies: [{ id, name, local }] }]. Único lugar que
+// faz essa junção — Inspect Mode consome isso, nunca lê `ids`/`items` direto.
+export function resolveDetailedTechGroups(project) {
+  return (project.techGroups || []).map((group) => ({
+    label: group.label,
+    technologies: [
+      ...(group.ids || []).map((id) => ({ id, name: technologyRegistry[id]?.name, local: false })),
+      ...(group.items || []).map((name) => ({ id: null, name, local: true })),
+    ],
+  }));
+}
+
+// Fatos do PRÓPRIO portfólio — não de um projeto no registry. Pequena e
+// centralizada só porque o Inspect Mode precisa citar isso em dois lugares
+// (Hero e Footer); não é um CMS, só evita strings soltas nos componentes.
+// stackTechIds reaproveita o technologyRegistry (nenhum nome digitado à mão);
+// as demais linhas são fatos já confirmados no código/handoff — nada inventado.
+export const portfolioInspectNotes = {
+  hero: {
+    stackTechIds: ["react", "vite", "tailwindcss", "framermotion"],
+    media: "AVIF → WebP (fallback), eager + fetchpriority=\"high\"",
+    mobileGrid: "Grid: radial-gradient <1024px — evita paint stall no Safari/iOS",
+    photoGlow: "Glow da foto sem blur <1024px — evita crash de pinch-zoom no Safari/iOS; 3D preservado",
+  },
+  engineering:
+    "Safari/iOS: dois bugs de compositing ligados a filter: blur(), isolados por A/B em device real — paint stall nos blurs grandes do grid de fundo, crash em pinch-zoom no blur do glow da foto. Mobile substitui/remove os dois; desktop preserva os efeitos originais.",
+};
 
 export const timeline = [
   {

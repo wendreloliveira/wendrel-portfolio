@@ -1,7 +1,8 @@
 import { SiPython, SiReact, SiTypescript, SiNextdotjs, SiFramer, SiFlask, SiGit, SiGithub, SiTailwindcss, SiSupabase, SiVite, SiPostgresql, SiSqlalchemy, SiPytest } from "react-icons/si";
 import Reveal from "../components/Reveal";
-import { technologyGroups, technologyRegistry } from "../lib/data";
+import { technologyGroups, technologyRegistry, getProjectTitlesByTechId } from "../lib/data";
 import { useTechGraph, hasFineHover, relationState } from "../context/graphState";
+import { useInspect } from "../context/inspectState";
 
 // Fundo por estado do Tech ↔ Project Graph — sem blur/glow, só cor e opacidade.
 const ROW_BG = {
@@ -32,6 +33,7 @@ const ICONS = {
 
 export default function Technologies() {
   const { activeTechId, activeProjectId, relatedTechIds, setActiveTech, clearActiveTech } = useTechGraph();
+  const { inspectMode } = useInspect();
 
   return (
     <section className="relative border-t border-base-border py-20">
@@ -96,6 +98,14 @@ export default function Technologies() {
                         <div>
                           <p className="text-sm font-medium text-ink">{name}</p>
                           <p className="mt-0.5 text-sm leading-relaxed text-ink-muted">{item.usage}</p>
+                          {inspectMode && item.techId && (() => {
+                            const titles = getProjectTitlesByTechId(item.techId);
+                            return titles.length > 0 ? (
+                              <p className="mt-1 font-mono text-[10px] text-ink-faint">
+                                Projetos: {titles.join(" · ")}
+                              </p>
+                            ) : null;
+                          })()}
                         </div>
                       </div>
                     );

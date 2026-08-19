@@ -1,6 +1,7 @@
 import Reveal from "../components/Reveal";
 import ProjectPreview from "../components/ProjectPreview";
 import ProjectCase from "../components/ProjectCase";
+import TechStackInspect from "../components/TechStackInspect";
 import { featuredProjects, secondaryProjects } from "../lib/data";
 import { useTechGraph, hasFineHover, relationState } from "../context/graphState";
 
@@ -80,6 +81,8 @@ function SecondaryProjectCard({ project, index, numberOffset }) {
             </span>
           ))}
         </div>
+
+        <TechStackInspect project={project} />
 
         {project.links?.length > 0 && (
           <div className="mt-4 flex flex-wrap gap-4">
