@@ -206,11 +206,17 @@ export const secondaryProjects = [
     title: "ClinicAI SCA",
     status: "Protótipo — Hackathon",
     tagline:
-      "Protótipo de IA para apoiar a triagem da Síndrome Coronariana Aguda, desenvolvido em equipe durante o Hackathon Univassouras. Participação em um programa ligado a uma oportunidade de aceleração de até R$ 200 mil.",
-    role: "Participei da equipe de prototipação ainda em período inicial da graduação — da lógica do problema à primeira versão funcional, sob pressão de tempo.",
+      "Protótipo de IA desenvolvido em equipe durante o Hackathon Univassouras, explorando o apoio à triagem da Síndrome Coronariana Aguda.",
+    role:
+      "Participei da equipe de prototipação, da definição da lógica do problema à primeira versão funcional, dentro do tempo limitado do hackathon.",
     stack: ["Python", "IA"],
     links: [],
-    media: emptyMedia(),
+    media: {
+      ...emptyMedia(),
+      cover: "/projects/clinicai/cover.webp",
+      coverAlt:
+        "Desenvolvimento do protótipo ClinicAI SCA durante o Hackathon Univassouras — mãos digitando com a interface do sistema aberta na tela do notebook.",
+    },
   },
   {
     slug: "piemp",

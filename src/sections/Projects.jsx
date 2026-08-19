@@ -27,7 +27,7 @@ function SecondaryProjectCard({ project, index, numberOffset }) {
         <h3 className="mt-3 font-display text-lg font-semibold text-ink">{project.title}</h3>
         <p className="mt-2 text-sm leading-relaxed text-ink-muted">{project.tagline}</p>
 
-        <ProjectPreview image={project.media?.cover} title={project.title} />
+        <ProjectPreview image={project.media?.cover} alt={project.media?.coverAlt} title={project.title} />
 
         {project.role && (
           <div>
