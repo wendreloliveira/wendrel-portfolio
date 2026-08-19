@@ -3,6 +3,7 @@ import { HiChevronLeft, HiChevronRight, HiOutlineExternalLink, HiOutlinePlay } f
 import Reveal from "./Reveal";
 import MediaPlaceholder from "./MediaPlaceholder";
 import ProjectMediaViewer from "./ProjectMediaViewer";
+import { useTechGraph, hasFineHover, relationState } from "../context/graphState";
 
 // Import dinâmico de verdade: o código do modal (portal, foco, iframe) só é
 // pedido ao navegador no primeiro clique em "Preview ao vivo" — antes disso,
@@ -103,6 +104,7 @@ export default function ProjectCase({ project, index }) {
     role,
     decisions,
     stack,
+    primaryTechIds,
     status,
     statusColor,
     links,
@@ -114,6 +116,15 @@ export default function ProjectCase({ project, index }) {
   const viewerRef = useRef(null);
   const [activeIndex, setActiveIndex] = useState(0);
   const [previewOpen, setPreviewOpen] = useState(false);
+  const { activeTechId, activeProjectId, relatedProjectSlugs, setActiveProject, clearActiveProject } = useTechGraph();
+  // Só opacidade aqui — ProjectCase é um case de página inteira (sem
+  // "cartão"), então o contraste entre o dimmed e o resto já é o destaque;
+  // não criamos borda/fundo novos nesta seção. Ver seção 11 do V2.2.
+  const graphState = relationState({
+    isActive: activeProjectId === slug,
+    isRelated: relatedProjectSlugs.includes(slug),
+    anyActive: !!activeTechId || !!activeProjectId,
+  });
   // Uma vez aberto, o modal continua montado mesmo fechado — senão a
   // animação de saída (AnimatePresence dentro do LivePreviewModal) é
   // cortada de repente ao desmontar. O que importa pro bundle inicial é só
@@ -126,7 +137,26 @@ export default function ProjectCase({ project, index }) {
 
   return (
     <Reveal>
-      <article id={slug} className="scroll-mt-24 border-t border-base-border py-20 first:border-t-0 first:pt-0 sm:py-24">
+      <article
+        id={slug}
+        onMouseEnter={() => {
+          if (hasFineHover()) setActiveProject(slug, primaryTechIds);
+        }}
+        onMouseLeave={clearActiveProject}
+        // Sem tabIndex aqui — onFocus/onBlur são as versões bubbling
+        // (focusin/focusout) e disparam a partir de qualquer descendente já
+        // focável (o link "Ver MVP ao vivo", o botão "Preview ao vivo", as
+        // setas do viewer). onBlur só limpa quando o foco sai de VERDADE do
+        // artigo inteiro (relatedTarget fora dele) — navegar entre os
+        // controles internos do mesmo projeto não pisca o estado.
+        onFocus={() => setActiveProject(slug, primaryTechIds)}
+        onBlur={(e) => {
+          if (!e.currentTarget.contains(e.relatedTarget)) clearActiveProject();
+        }}
+        className={`scroll-mt-24 border-t border-base-border py-20 transition-opacity duration-150 first:border-t-0 first:pt-0 sm:py-24 ${
+          graphState === "dimmed" ? "opacity-55" : "opacity-100"
+        }`}
+      >
         <div className="mx-auto max-w-3xl">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <p className="font-mono text-xs uppercase tracking-widest text-signal-blue">

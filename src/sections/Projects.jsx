@@ -2,16 +2,50 @@ import Reveal from "../components/Reveal";
 import ProjectPreview from "../components/ProjectPreview";
 import ProjectCase from "../components/ProjectCase";
 import { featuredProjects, secondaryProjects } from "../lib/data";
+import { useTechGraph, hasFineHover, relationState } from "../context/graphState";
+
+// Borda por estado do Tech ↔ Project Graph — secondary é mais discreto que
+// featured, então reaproveita o mesmo tom do hover:border-signal-blue/30 já
+// existente em vez de um accent novo.
+const CARD_BORDER = {
+  idle: "border-base-border",
+  active: "border-signal-blue/40",
+  related: "border-signal-blue/40",
+  dimmed: "border-base-border",
+};
 
 // Mesma estrutura para todos — só conteúdo/imagem/tags/categoria/status
 // mudam. Numeração continua a dos projetos em destaque (offset = quantos
 // featured existem), então não precisa de ajuste manual se esse número mudar.
 function SecondaryProjectCard({ project, index, numberOffset }) {
+  const { activeTechId, activeProjectId, relatedProjectSlugs, setActiveProject, clearActiveProject } = useTechGraph();
+  const state = relationState({
+    isActive: activeProjectId === project.slug,
+    isRelated: relatedProjectSlugs.includes(project.slug),
+    anyActive: !!activeTechId || !!activeProjectId,
+  });
+
   return (
     <Reveal delay={index * 0.06} className="h-full">
       <article
         id={project.slug}
-        className="flex h-full scroll-mt-24 flex-col rounded-2xl border border-base-border bg-base-surface/50 p-6 transition-colors duration-300 hover:border-signal-blue/30"
+        onMouseEnter={() => {
+          if (hasFineHover()) setActiveProject(project.slug, project.primaryTechIds);
+        }}
+        onMouseLeave={clearActiveProject}
+        // Mesmo padrão do ProjectCase: sem tabIndex, onFocus/onBlur usam a
+        // versão bubbling (focusin/focusout) de qualquer link já focável
+        // dentro do card. Hoje nem VassVegas nem ClinicAI têm `links`
+        // preenchido, então não há nó focável interno ainda — a relação por
+        // teclado só passa a existir quando um link real for adicionado ao
+        // projeto (ver relatório da V2.2A).
+        onFocus={() => setActiveProject(project.slug, project.primaryTechIds)}
+        onBlur={(e) => {
+          if (!e.currentTarget.contains(e.relatedTarget)) clearActiveProject();
+        }}
+        className={`flex h-full scroll-mt-24 flex-col rounded-2xl border ${CARD_BORDER[state]} bg-base-surface/50 p-6 transition-[border-color,opacity] duration-150 hover:border-signal-blue/30 ${
+          state === "dimmed" ? "opacity-55" : "opacity-100"
+        }`}
       >
         <div className="flex items-center justify-between gap-2">
           <p className="font-mono text-[11px] uppercase tracking-widest text-signal-blue">

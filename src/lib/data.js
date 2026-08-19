@@ -314,6 +314,14 @@ export const secondaryProjects = [
   stack: project.stack ?? resolveTechNames(project.primaryTechIds),
 }));
 
+// Tech ↔ Project Graph: única forma de perguntar "quais projetos usam X" —
+// nenhum componente deve comparar nomes de tecnologia ou manter um mapa à parte.
+export function getProjectSlugsByTechId(techId) {
+  return [...featuredProjects, ...secondaryProjects]
+    .filter((project) => project.primaryTechIds?.includes(techId))
+    .map((project) => project.slug);
+}
+
 export const timeline = [
   {
     tag: "Formação",

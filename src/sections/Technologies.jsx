@@ -1,6 +1,15 @@
 import { SiPython, SiReact, SiTypescript, SiNextdotjs, SiFramer, SiFlask, SiGit, SiGithub, SiTailwindcss, SiSupabase, SiVite, SiPostgresql, SiSqlalchemy, SiPytest } from "react-icons/si";
 import Reveal from "../components/Reveal";
 import { technologyGroups, technologyRegistry } from "../lib/data";
+import { useTechGraph, hasFineHover, relationState } from "../context/graphState";
+
+// Fundo por estado do Tech ↔ Project Graph — sem blur/glow, só cor e opacidade.
+const ROW_BG = {
+  idle: "",
+  active: "bg-base-elevated/70",
+  related: "bg-base-elevated/35",
+  dimmed: "",
+};
 
 // Ícone é só apoio visual, mapeado por techId — não existe entrada aqui sem
 // uma linha de uso correspondente em technologyGroups (src/lib/data.js).
@@ -22,6 +31,8 @@ const ICONS = {
 };
 
 export default function Technologies() {
+  const { activeTechId, activeProjectId, relatedTechIds, setActiveTech, clearActiveTech } = useTechGraph();
+
   return (
     <section className="relative border-t border-base-border py-20">
       <div className="mx-auto max-w-5xl px-6">
@@ -47,11 +58,36 @@ export default function Technologies() {
                 <div className="mt-4 flex flex-col gap-4">
                   {group.items.map((item) => {
                     // Nome vem do registry quando há techId; "SQL" (sem
-                    // tecnologia canônica confirmada) usa o `name` literal.
+                    // tecnologia canônica confirmada) usa o `name` literal e
+                    // fica de fora do grafo — não participa da relação.
                     const name = item.techId ? technologyRegistry[item.techId]?.name : item.name;
                     const Icon = item.techId ? ICONS[item.techId] : null;
+                    const state = item.techId
+                      ? relationState({
+                          isActive: item.techId === activeTechId,
+                          isRelated: relatedTechIds.includes(item.techId),
+                          anyActive: !!activeTechId || !!activeProjectId,
+                        })
+                      : "idle";
                     return (
-                      <div key={item.techId ?? item.name} className="flex items-start gap-3">
+                      <div
+                        key={item.techId ?? item.name}
+                        tabIndex={item.techId ? 0 : undefined}
+                        onMouseEnter={
+                          item.techId
+                            ? () => {
+                                if (hasFineHover()) setActiveTech(item.techId);
+                              }
+                            : undefined
+                        }
+                        onMouseLeave={item.techId ? clearActiveTech : undefined}
+                        onFocus={item.techId ? () => setActiveTech(item.techId) : undefined}
+                        onBlur={item.techId ? clearActiveTech : undefined}
+                        aria-label={item.techId ? `Tecnologia: ${name}` : undefined}
+                        className={`-m-2 flex items-start gap-3 rounded-lg p-2 transition-[background-color,opacity] duration-150 ${ROW_BG[state]} ${
+                          state === "dimmed" ? "opacity-50" : "opacity-100"
+                        } ${item.techId ? "focus-visible:outline focus-visible:outline-2 focus-visible:outline-signal-blue/60 focus-visible:outline-offset-2" : ""}`}
+                      >
                         {Icon ? (
                           <Icon size={18} className="mt-0.5 shrink-0 text-ink-faint" />
                         ) : (
