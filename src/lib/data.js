@@ -68,8 +68,43 @@ export const featuredProjects = [
     },
   },
   {
-    slug: "risk",
+    slug: "naboa",
     order: 2,
+    title: "NABOA Streetwear",
+    category: "E-commerce demonstrativo • Full stack",
+    tagline:
+      "De vitrine estática a uma aplicação full-stack em Flask: catálogo dinâmico, autenticação, carrinho, pedidos, estoque e PostgreSQL persistente.",
+    highlights: ["291 testes automatizados", "Flask + PostgreSQL", "Deploy público no Render"],
+    accent: "amber",
+    status: "Demo pública",
+    statusColor: "amber",
+    context:
+      "Começou como uma vitrine estática em HTML, CSS e JavaScript. Evoluiu para uma aplicação Flask dinâmica, com banco de dados relacional, autenticação e regras de negócio reais por trás do catálogo. É uma vitrine demonstrativa — nenhum pagamento real é processado.",
+    problem: "",
+    role:
+      "Responsável pelo desenvolvimento da aplicação: modelagem do banco de dados, autenticação, regras de carrinho e estoque, testes automatizados e publicação em produção.",
+    decisions: [
+      "Evolução arquitetural: vitrine estática (HTML/CSS/JS) evoluiu para uma aplicação Flask dinâmica, com banco de dados e regras de negócio reais.",
+      "Integridade de carrinho, pedido e estoque: controle transacional, proteção contra duplicação de pedido e proteção contra alteração do carrinho após a revisão.",
+      "Persistência e publicação: PostgreSQL persistente no Neon, migrações com Alembic e deploy público no Render.",
+    ],
+    stack: ["Python", "Flask", "PostgreSQL", "SQLAlchemy", "pytest"],
+    liveUrl: "https://naboa-streetwear.onrender.com/",
+    liveCtaLabel: "Ver projeto ao vivo",
+    links: [],
+    media: {
+      ...emptyMedia(),
+      cover: "/projects/naboa/cover.webp",
+      desktop: [
+        { src: "/projects/naboa/cover.webp", alt: "NABOA Streetwear — página inicial", caption: "Página inicial" },
+        { src: "/projects/naboa/desktop-catalogo.webp", alt: "NABOA Streetwear — catálogo", caption: "Catálogo" },
+        { src: "/projects/naboa/desktop-produto.webp", alt: "NABOA Streetwear — detalhe de produto", caption: "Detalhe de produto" },
+      ],
+    },
+  },
+  {
+    slug: "risk",
+    order: 3,
     title: "RISK Soluções Empresariais",
     category: "Projeto empresarial",
     tagline: "Evolução da presença digital de uma empresa real de BPO financeiro, contabilidade e RH.",
@@ -104,7 +139,7 @@ export const featuredProjects = [
   },
   {
     slug: "dkastro",
-    order: 3,
+    order: 4,
     title: "D' Kastro Café Bistrô",
     category: "Frontend & Motion",
     tagline: "Landing page para um café bistrô real em Vassouras — RJ.",

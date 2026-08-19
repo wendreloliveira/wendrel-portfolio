@@ -3,10 +3,10 @@ import ProjectPreview from "../components/ProjectPreview";
 import ProjectCase from "../components/ProjectCase";
 import { featuredProjects, secondaryProjects } from "../lib/data";
 
-// Mesma estrutura para os três — só conteúdo/imagem/tags/categoria/status
-// mudam. Numeração continua a dos projetos em destaque (01-03), então
-// estes começam em 04.
-function SecondaryProjectCard({ project, index }) {
+// Mesma estrutura para todos — só conteúdo/imagem/tags/categoria/status
+// mudam. Numeração continua a dos projetos em destaque (offset = quantos
+// featured existem), então não precisa de ajuste manual se esse número mudar.
+function SecondaryProjectCard({ project, index, numberOffset }) {
   return (
     <Reveal delay={index * 0.06} className="h-full">
       <article
@@ -15,7 +15,7 @@ function SecondaryProjectCard({ project, index }) {
       >
         <div className="flex items-center justify-between gap-2">
           <p className="font-mono text-[11px] uppercase tracking-widest text-signal-blue">
-            {String(index + 4).padStart(2, "0")} / {project.category}
+            {String(index + numberOffset + 1).padStart(2, "0")} / {project.category}
           </p>
           {project.status && (
             <span className="shrink-0 rounded-full border border-base-border px-2.5 py-0.5 text-[10px] font-medium text-ink-muted">
@@ -116,7 +116,7 @@ export default function Projects() {
 
           <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {secondaryProjects.map((project, i) => (
-              <SecondaryProjectCard key={project.slug} project={project} index={i} />
+              <SecondaryProjectCard key={project.slug} project={project} index={i} numberOffset={featuredProjects.length} />
             ))}
           </div>
         </div>

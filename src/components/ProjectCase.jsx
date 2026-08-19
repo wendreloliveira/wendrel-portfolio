@@ -34,7 +34,7 @@ function Tag({ children }) {
   );
 }
 
-// Barra de legenda/navegação única para os 3 projetos: contador + legenda do
+// Barra de legenda/navegação única para os projetos em destaque: contador + legenda do
 // que está sendo mostrado + setas sempre visíveis (não dependem de hover,
 // então funcionam em touch) + dots. Pilota o viewer via ref.
 function MediaCaptionBar({ images, activeIndex, viewerRef, projectTitle }) {
@@ -88,12 +88,27 @@ function MediaCaptionBar({ images, activeIndex, viewerRef, projectTitle }) {
   );
 }
 
-// Estudo de caso — design system único para os 3 projetos em destaque.
+// Estudo de caso — design system único para todos os projetos em destaque.
 // A identidade de cada um vem do conteúdo (screenshots, copy, status,
 // stack), não de uma estrutura de layout diferente por projeto.
 export default function ProjectCase({ project, index }) {
-  const { slug, title, category, tagline, context, problem, role, decisions, stack, status, statusColor, links, liveUrl, liveCtaLabel } =
-    project;
+  const {
+    slug,
+    title,
+    category,
+    tagline,
+    highlights,
+    context,
+    problem,
+    role,
+    decisions,
+    stack,
+    status,
+    statusColor,
+    links,
+    liveUrl,
+    liveCtaLabel,
+  } = project;
   const images = project.media?.desktop || [];
   const viewerRef = useRef(null);
   const [activeIndex, setActiveIndex] = useState(0);
@@ -127,6 +142,9 @@ export default function ProjectCase({ project, index }) {
 
           <h3 className="mt-3 font-display text-3xl font-semibold tracking-tight text-ink sm:text-4xl">{title}</h3>
           {tagline && <p className="mt-3 text-ink-muted">{tagline}</p>}
+          {highlights?.length > 0 && (
+            <p className="mt-3 font-mono text-[11px] uppercase tracking-wide text-ink-faint">{highlights.join(" · ")}</p>
+          )}
 
           {stack?.length > 0 && (
             <div className="mt-4 flex flex-wrap gap-2">

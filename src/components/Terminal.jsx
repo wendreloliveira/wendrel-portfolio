@@ -4,14 +4,15 @@ import { forceLoad } from "./Deferred";
 
 const PROMPT = "PS C:\\wendrel>";
 
-// liveUrl vem de data.js (fonte única) — só empregaai/risk/dkastro têm MVP
-// publicado, então "visit" só existe para esses três.
+// liveUrl vem de data.js (fonte única) — só quem tem MVP publicado
+// (empregaai/naboa/risk/dkastro) recebe um, então "visit" só existe pra esses.
 function liveUrlOf(slug) {
   return featuredProjects.find((p) => p.slug === slug)?.liveUrl;
 }
 
 const OPENABLE = [
   { slug: "empregaai", label: "EmpregaAI", type: "produto / software", liveUrl: liveUrlOf("empregaai") },
+  { slug: "naboa", label: "NABOA Streetwear", type: "e-commerce / full stack", liveUrl: liveUrlOf("naboa") },
   { slug: "risk", label: "RISK", type: "projeto empresarial", liveUrl: liveUrlOf("risk") },
   { slug: "dkastro", label: "DKastro", type: "frontend / motion", liveUrl: liveUrlOf("dkastro") },
   { slug: "vassvegas", label: "VassVegas", type: "produto multidisciplinar" },
@@ -23,8 +24,8 @@ const HELP_LINES = [
   "about             resumo profissional",
   "projects          projetos reais",
   "stack             tecnologias por uso real",
-  "open <projeto>    abre um case (empregaai, risk, dkastro, vassvegas)",
-  "visit <projeto>   abre o MVP publicado em nova aba (empregaai, risk, dkastro)",
+  "open <projeto>    abre um case (empregaai, naboa, risk, dkastro, vassvegas)",
+  "visit <projeto>   abre o MVP publicado em nova aba (empregaai, naboa, risk, dkastro)",
   "contact           vai até o contato",
   "clear             limpa o terminal",
 ];
@@ -96,7 +97,7 @@ function runCommand(raw) {
       if (!target) {
         return [
           `projeto não encontrado: ${args[0] || ""}`,
-          "use: open empregaai | risk | dkastro | vassvegas",
+          "use: open empregaai | naboa | risk | dkastro | vassvegas",
         ];
       }
       goToSection(target.slug);
@@ -108,7 +109,7 @@ function runCommand(raw) {
       if (!target || !target.liveUrl) {
         return [
           `MVP não encontrado: ${args[0] || ""}`,
-          "use: visit empregaai | risk | dkastro",
+          "use: visit empregaai | naboa | risk | dkastro",
         ];
       }
       window.open(target.liveUrl, "_blank", "noopener,noreferrer");

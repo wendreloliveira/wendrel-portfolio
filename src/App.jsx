@@ -24,9 +24,9 @@ export default function App() {
         */}
         <Deferred
           id="projetos"
-          anchorIds={["projetos", "empregaai", "risk", "dkastro", "vassvegas", "clinicai", "piemp"]}
+          anchorIds={["projetos", "empregaai", "naboa", "risk", "dkastro", "vassvegas", "clinicai", "piemp"]}
           rootMargin="800px 0px"
-          minHeightClassName="min-h-[7013px] sm:min-h-[6200px] lg:min-h-[5935px]"
+          minHeightClassName="min-h-[8896px] sm:min-h-[7665px] lg:min-h-[7742px]"
           importer={() => import("./sections/Projects")}
         />
         <Deferred

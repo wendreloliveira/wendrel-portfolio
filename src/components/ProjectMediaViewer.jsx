@@ -18,7 +18,7 @@ function onIdle(fn) {
 // Viewer de screenshots reutilizável — controla apenas o "qual índice está
 // ativo" e como transicionar entre eles. A apresentação ao redor (dots vs.
 // filmstrip vs. grid clicável) fica a cargo de quem usa este componente,
-// via showDots/onIndexChange/ref, para não repetir o mesmo layout nos 3 projetos.
+// via showDots/onIndexChange/ref, para não repetir o mesmo layout em cada projeto.
 const ProjectMediaViewer = forwardRef(function ProjectMediaViewer(
   { images, projectTitle, initialIndex = 0, showDots = true, showArrows = true, aspectClassName = "aspect-[4/3]", className = "", onIndexChange },
   ref
