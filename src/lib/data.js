@@ -55,7 +55,7 @@ export const featuredProjects = [
       "Onboarding do candidato pensado para capturar habilidades reais, não apenas cargos anteriores.",
       "Arquitetura pensada para evoluir de matching por regras para recomendação mais sofisticada sem reescrever a base de dados.",
     ],
-    stack: ["Python", "Django", "SQL"],
+    stack: ["Python", "Flask", "React", "PostgreSQL"],
     liveUrl: "https://emprega-ai-wheat.vercel.app/",
     links: [],
     media: {
@@ -263,8 +263,7 @@ export const technologyGroups = [
     category: "Back-end",
     items: [
       { name: "Python", usage: "Usado em APIs, automação e lógica de aplicações no EmpregaAI e no PIEMP." },
-      { name: "Django", usage: "Usado no backend do EmpregaAI." },
-      { name: "Flask", usage: "Backend e regras de negócio da aplicação da NABOA — rotas, autenticação e lógica de carrinho e estoque." },
+      { name: "Flask", usage: "Backend e regras de negócio das aplicações da NABOA e do EmpregaAI." },
       { name: "SQLAlchemy", usage: "ORM e modelagem do banco relacional da NABOA." },
     ],
   },
