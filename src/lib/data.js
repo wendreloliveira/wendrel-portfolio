@@ -6,10 +6,11 @@ export const profile = {
     "Engenharia de Software aplicada a produtos digitais, automação e experiências web — de MVPs multidisciplinares a entregas reais para empresas.",
   formation: "Cursando Engenharia de Software — Univassouras",
   location: "Brasil",
-  email: "contato@wendrel.dev",
-  whatsapp: "https://wa.me/55",
+  email: "oliveirawendrel767@gmail.com",
+  whatsapp: "https://wa.me/5524993134210",
   linkedin: "https://www.linkedin.com/in/wendrel-oliveira",
-  github: "https://github.com/wendrel-oliveira",
+  github: "https://github.com/wendreloliveira",
+  instagram: "https://www.instagram.com/heeywl/",
 };
 
 export const stats = [

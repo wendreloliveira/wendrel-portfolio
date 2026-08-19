@@ -1,6 +1,6 @@
 import { HiArrowUpRight } from "react-icons/hi2";
 import { HiOutlineMail } from "react-icons/hi";
-import { FaWhatsapp, FaLinkedinIn, FaGithub } from "react-icons/fa";
+import { FaWhatsapp, FaLinkedinIn, FaGithub, FaInstagram } from "react-icons/fa";
 import Reveal from "../components/Reveal";
 import { profile } from "../lib/data";
 
@@ -21,10 +21,17 @@ const CHANNELS = [
   },
   {
     label: "GitHub",
-    handle: "/wendrel-oliveira",
+    handle: "/wendreloliveira",
     href: profile.github,
     Icon: FaGithub,
     color: "#F3F4F6",
+  },
+  {
+    label: "Instagram",
+    handle: "@heeywl",
+    href: profile.instagram,
+    Icon: FaInstagram,
+    color: "#E8734A",
   },
   {
     label: "Email",
