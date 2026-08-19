@@ -38,18 +38,18 @@ export const featuredProjects = [
     slug: "empregaai",
     order: 4,
     title: "EmpregaAI",
-    category: "Produto digital",
+    category: "Produto digital • Empregabilidade",
     tagline:
-      "Plataforma inteligente de empregabilidade que conecta pessoas, oportunidades e desenvolvimento profissional.",
+      "Plataforma de empregabilidade em desenvolvimento para conectar pessoas, oportunidades e caminhos de evolução profissional.",
     accent: "blue",
     status: "Em desenvolvimento",
     statusColor: "blue",
     context:
-      "Nasceu de um projeto multidisciplinar entre Engenharia de Software e Gestão Pública, pensado como uma plataforma para aproximar cidadãos, empresas e oportunidades reais de trabalho.",
+      "O EmpregaAI está sendo desenvolvido no contexto do PIEMP por uma equipe multidisciplinar de Engenharia de Software e Gestão Pública, com orientação de um professor mentor da área de Ciência da Computação — pensado como uma plataforma para aproximar cidadãos, empresas e oportunidades reais de trabalho.",
     problem:
       "Candidatos têm dificuldade para traduzir habilidades reais em oportunidades compatíveis, e processos de seleção carecem de um vocabulário estruturado para comparar perfil e vaga além de palavras-chave soltas.",
     role:
-      "Atuo no desenvolvimento do produto dentro de uma equipe multidisciplinar, contribuindo com o onboarding e perfil do candidato, o vocabulário estruturado de habilidades e a base da lógica de matching entre perfil e oportunidades.",
+      "Participo do desenvolvimento do produto e da implementação técnica ao lado de outro integrante de Engenharia de Software, trabalhando em conjunto com duas integrantes de Gestão Pública na definição da experiência, do problema e da proposta de valor. Minha contribuição técnica inclui o onboarding e perfil do candidato, o vocabulário estruturado de habilidades e a base da lógica de matching entre perfil e oportunidades.",
     decisions: [
       "Vocabulário estruturado de habilidades e áreas, em vez de tags livres, para permitir comparação consistente entre perfil e vaga.",
       "Onboarding do candidato pensado para capturar habilidades reais, não apenas cargos anteriores.",
@@ -218,18 +218,6 @@ export const secondaryProjects = [
         "Desenvolvimento do protótipo ClinicAI SCA durante o Hackathon Univassouras — mãos digitando com a interface do sistema aberta na tela do notebook.",
     },
   },
-  {
-    slug: "piemp",
-    category: "Pesquisa aplicada",
-    title: "PIEMP / CNPq",
-    status: "Pesquisa",
-    tagline:
-      "Programa de inovação e pesquisa com contato direto com inteligência artificial, automação e análise de dados, ao longo de seis meses.",
-    role: "Participação no programa como parte da minha formação em pesquisa aplicada.",
-    stack: ["Python", "IA", "Dados", "Automação"],
-    links: [],
-    media: emptyMedia(),
-  },
 ];
 
 export const timeline = [
@@ -244,19 +232,14 @@ export const timeline = [
     description: "Protótipo de IA para apoiar a triagem da Síndrome Coronariana Aguda, em equipe, sob pressão de tempo. Participação em um programa ligado a uma oportunidade de aceleração de até R$ 200 mil.",
   },
   {
-    tag: "Pesquisa",
-    title: "PIEMP / CNPq",
-    description: "Seis meses de pesquisa aplicada em inteligência artificial, automação e dados.",
-  },
-  {
     tag: "Produto multidisciplinar",
     title: "VassVegas Campus",
     description: "Entrada no time multidisciplinar responsável pelo MVP de um ecossistema universitário digital.",
   },
   {
     tag: "Produto",
-    title: "EmpregaAI",
-    description: "Desenvolvimento de uma plataforma de empregabilidade em equipe multidisciplinar — da lógica de perfil ao matching entre candidato e oportunidade.",
+    title: "EmpregaAI / PIEMP",
+    description: "Projeto multidisciplinar de Engenharia de Software e Gestão Pública, com orientação de um professor mentor da área de Ciência da Computação — desenvolvimento do EmpregaAI, uma plataforma de empregabilidade, da lógica de perfil ao matching entre candidato e oportunidade.",
   },
   {
     tag: "Empresarial",
@@ -281,13 +264,15 @@ export const technologyGroups = [
     items: [
       { name: "Python", usage: "Usado em APIs, automação e lógica de aplicações no EmpregaAI e no PIEMP." },
       { name: "Django", usage: "Usado no backend do EmpregaAI." },
-      { name: "Flask", usage: "Usado em APIs e projetos backend com Python." },
+      { name: "Flask", usage: "Backend e regras de negócio da aplicação da NABOA — rotas, autenticação e lógica de carrinho e estoque." },
+      { name: "SQLAlchemy", usage: "ORM e modelagem do banco relacional da NABOA." },
     ],
   },
   {
     category: "Dados",
     items: [
       { name: "Supabase", usage: "Autenticação, banco de dados e storage do VassVegas Campus." },
+      { name: "PostgreSQL", usage: "Banco relacional de produção da NABOA, hospedado no Neon, com migrações via Alembic." },
       { name: "SQL", usage: "Modelagem de dados em projetos como PIEMP e EmpregaAI." },
     ],
   },
@@ -297,6 +282,7 @@ export const technologyGroups = [
       { name: "Git", usage: "Versionamento em todos os projetos." },
       { name: "GitHub", usage: "Colaboração e histórico de código em equipe." },
       { name: "Vite", usage: "Build tool do RISK e deste portfólio." },
+      { name: "pytest", usage: "291 testes automatizados no backend da NABOA." },
     ],
   },
 ];

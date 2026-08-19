@@ -1,4 +1,4 @@
-import { SiPython, SiReact, SiTypescript, SiNextdotjs, SiFramer, SiDjango, SiFlask, SiGit, SiGithub, SiTailwindcss, SiSupabase, SiVite } from "react-icons/si";
+import { SiPython, SiReact, SiTypescript, SiNextdotjs, SiFramer, SiDjango, SiFlask, SiGit, SiGithub, SiTailwindcss, SiSupabase, SiVite, SiPostgresql, SiSqlalchemy, SiPytest } from "react-icons/si";
 import Reveal from "../components/Reveal";
 import { technologyGroups } from "../lib/data";
 
@@ -13,10 +13,13 @@ const ICONS = {
   Python: SiPython,
   Django: SiDjango,
   Flask: SiFlask,
+  SQLAlchemy: SiSqlalchemy,
   Supabase: SiSupabase,
+  PostgreSQL: SiPostgresql,
   Git: SiGit,
   GitHub: SiGithub,
   Vite: SiVite,
+  pytest: SiPytest,
 };
 
 export default function Technologies() {
