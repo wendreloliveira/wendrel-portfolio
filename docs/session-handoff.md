@@ -67,6 +67,15 @@ Ambos confirmados por A/B em iPhone real (não só Chromium), via Vercel Preview
 
 Branches de diagnóstico preservadas (não deletar ainda): `diag/mobile-paint-stall`, `fix/mobile-hero-compositing`, `diag/photo-zoom-3d`, `diag/photo-zoom-blur`, `fix/mobile-photo-zoom`.
 
+## V2.2 — Tech ↔ Project Graph
+
+- `technologyRegistry` / `primaryTechIds` são a fonte da relação;
+- hover/focus em tecnologia destaca projetos relacionados;
+- hover/focus interno em featured project destaca primary technologies;
+- mobile funciona como progressive enhancement;
+- sem blur/filter/listener global/RAF;
+- limitação conhecida: secondary projects sem elemento focável ainda não possuem trigger Project → Technology por teclado.
+
 ## Próxima fase
 
 Nenhuma pendência aberta. Deployed em https://wendrel-portfolio.vercel.app, com metadados de produção finalizados e os dois bugs de mobile Safari corrigidos.
