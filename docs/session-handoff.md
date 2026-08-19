@@ -57,6 +57,16 @@ Registro breve — não alterar sem evidência (Lighthouse) de que algo regrediu
 - Media gating, iframe de preview 100% sob demanda, TBT do Framer Motion já diagnosticado (P2 não foi necessário).
 - `Deferred` min-height do Projects recalibrado nesta sprint (era herdado de quando havia 3 secondary cards; agora são 2) — medido ao vivo em 390/700/1318px.
 
+## Mobile Safari — dois bugs reais corrigidos em produção
+
+Ambos confirmados por A/B em iPhone real (não só Chromium), via Vercel Preview Deployments isolando uma variável por vez.
+
+**Bug 1 — paint stall no Hero.** Causa: os dois glows do `GridBackground.jsx` (900×520 `blur(140px)` + 360×360 `blur(120px)`) somavam quase toda a 1ª dobra em `filter:blur()`, dentro de um `motion.div` transform-animado — Safari/iOS travava pintando a página por vários segundos. Fix: `radial-gradient` (mesmas cores/opacidades) em `<1024px`; `lg:` preserva o blur original no desktop.
+
+**Bug 2 — crash/reload ao dar pinch-zoom sobre a foto do Hero.** Isolado em duas rodadas de A/B: sem o 3D do card (`rotateX`/`rotateY`/`transformPerspective`) o zoom melhorava mas ainda derrubava com zoom forte; com o 3D original mas sem o `blur(64px)` do glow da foto, ficou estável. **Causa decisiva: o `blur(64px)` do glow**, não o 3D. Fix: mesmo padrão — `blur-3xl` vira `lg:blur-3xl` em `Hero.jsx`, sem `filter` em `<1024px`, 3D e blur originais preservados em `lg:` (≥1024px).
+
+Branches de diagnóstico preservadas (não deletar ainda): `diag/mobile-paint-stall`, `fix/mobile-hero-compositing`, `diag/photo-zoom-3d`, `diag/photo-zoom-blur`, `fix/mobile-photo-zoom`.
+
 ## Próxima fase
 
-Nenhuma pendência aberta. Deployed em https://wendrel-portfolio.vercel.app, com metadados de produção finalizados.
+Nenhuma pendência aberta. Deployed em https://wendrel-portfolio.vercel.app, com metadados de produção finalizados e os dois bugs de mobile Safari corrigidos.
