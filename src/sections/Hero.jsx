@@ -119,7 +119,13 @@ export default function Hero() {
             transition={{ duration: 0.8, delay: 0.25, ease: [0.16, 1, 0.3, 1] }}
             className="relative mx-auto w-full max-w-xs md:max-w-none"
           >
-            <div aria-hidden="true" className="absolute -inset-6 -z-10 rounded-[2.5rem] bg-grad-signal opacity-[0.15] blur-3xl" />
+            {/* DIAGNÓSTICO TEMPORÁRIO (diag/photo-zoom-blur): blur só a partir
+                de lg (1024px) — isola o filter:blur(64px) do 3D do card pai
+                para o teste de crash de pinch-zoom no Safari/iPhone. 3D
+                (rotateX/rotateY/transformPerspective, acima) permanece o
+                original de produção, intocado. NÃO É FIX — reverter para
+                blur-3xl sem prefixo ao concluir o teste. */}
+            <div aria-hidden="true" className="absolute -inset-6 -z-10 rounded-[2.5rem] bg-grad-signal opacity-[0.15] lg:blur-3xl" />
             <div className="relative overflow-hidden rounded-3xl border border-base-border">
               {/*
                 A imagem já vem recortada exatamente em 4:5 (mesma proporção do
