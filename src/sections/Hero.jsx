@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { HiArrowRight } from "react-icons/hi";
 import GridBackground from "../components/GridBackground";
@@ -17,6 +17,20 @@ export default function Hero() {
   const rotateX = useTransform(springY, [-40, 40], [3, -3]);
   const rotateY = useTransform(springX, [-40, 40], [-3, 3]);
   const translateBg = useTransform(springX, [-40, 40], [-14, 14]);
+
+  // DIAGNÓSTICO TEMPORÁRIO (diag/photo-zoom-3d): isola o contexto 3D
+  // (transformPerspective + rotateX/rotateY) do card da foto em <1024px,
+  // testando se ele contribui para o crash de pinch-zoom no Safari/iPhone.
+  // NÃO É FIX — reverter (remover is3DEnabled e o style condicional abaixo)
+  // ao concluir o teste. blur(64px) do glow permanece intocado de propósito.
+  const [is3DEnabled, setIs3DEnabled] = useState(true);
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 1024px)");
+    const update = () => setIs3DEnabled(mq.matches);
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, []);
 
   const handleMouseMove = (e) => {
     const bounds = ref.current?.getBoundingClientRect();
@@ -113,7 +127,7 @@ export default function Hero() {
 
           {/* Fotografia — elemento editorial, não mais um card pequeno sobre o terminal. */}
           <motion.div
-            style={{ rotateX, rotateY, transformPerspective: 1000 }}
+            style={is3DEnabled ? { rotateX, rotateY, transformPerspective: 1000 } : {}}
             initial={{ opacity: 0, scale: 0.96 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.8, delay: 0.25, ease: [0.16, 1, 0.3, 1] }}
