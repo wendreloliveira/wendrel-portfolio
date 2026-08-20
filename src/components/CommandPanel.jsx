@@ -45,7 +45,11 @@ export default function CommandPanel({ onRunCommand }) {
         Clique num comando para preenchê-lo no terminal.
       </p>
 
-      <div className="rounded-2xl border border-base-border bg-base-surface/80 shadow-soft backdrop-blur-sm">
+      {/* Sem backdrop-blur (restrição desta sprint): bg-base-surface quase
+          opaco (/95, sem filter) substitui o efeito frosted-glass do
+          Terminal por uma superfície sólida — mesma paleta, mesmo peso
+          visual, sem nova superfície de filter/backdrop-filter. */}
+      <div className="rounded-2xl border border-base-border bg-base-surface/95 shadow-soft">
         <div className="flex items-center gap-2 border-b border-base-border px-4 py-3">
           <span className="h-2.5 w-2.5 rounded-full bg-red-500/70" />
           <span className="h-2.5 w-2.5 rounded-full bg-amber-400/70" />
