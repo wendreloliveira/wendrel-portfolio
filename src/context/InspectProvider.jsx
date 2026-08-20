@@ -10,11 +10,9 @@ export function InspectProvider({ children }) {
   const [openProjectId, setOpenProjectId] = useState(null);
   // Terminal passou a ser controlado por aqui (não mais isOpen interno dele)
   // — é a única forma de Navbar/Bob abrirem e fecharem o Terminal sem
-  // querySelector/DOM. Mesmo default que o Terminal já tinha sozinho:
-  // mobile nasce recolhido, desktop nasce aberto.
-  const [terminalOpen, setTerminalOpenState] = useState(
-    () => typeof window !== "undefined" && window.innerWidth >= 768
-  );
+  // querySelector/DOM. Fechado por padrão em qualquer breakpoint — Developer
+  // Mode é quem abre; abrir manualmente continua possível e independente.
+  const [terminalOpen, setTerminalOpenState] = useState(false);
 
   const value = useMemo(() => {
     function enableInspect() {

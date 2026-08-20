@@ -203,6 +203,34 @@ export default function Terminal({ open, onOpenChange }) {
     if (bodyRef.current) bodyRef.current.scrollTop = bodyRef.current.scrollHeight;
   }, [lines]);
 
+  // Mini boot só na transição OFF → ON do Developer Mode (não no mount, não
+  // ao fechar) — dá uma sensação de "abrindo", não de aparecer seco. Curto
+  // de propósito: 2 linhas, 2 timers, sem loop. Reduced motion pula direto
+  // pro resultado final.
+  const wasInspectMode = useRef(inspect.inspectMode);
+  useEffect(() => {
+    const turnedOn = !wasInspectMode.current && inspect.inspectMode;
+    wasInspectMode.current = inspect.inspectMode;
+    if (!turnedOn) return;
+
+    const reducedMotion =
+      typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reducedMotion) {
+      setLines((prev) => [
+        ...prev,
+        { type: "input", text: "init dev-mode" },
+        { type: "output", text: "Developer Mode enabled." },
+      ]);
+      return;
+    }
+    const t1 = setTimeout(() => setLines((prev) => [...prev, { type: "input", text: "init dev-mode" }]), 150);
+    const t2 = setTimeout(
+      () => setLines((prev) => [...prev, { type: "output", text: "Developer Mode enabled." }]),
+      450
+    );
+    return () => [t1, t2].forEach(clearTimeout);
+  }, [inspect.inspectMode]);
+
   function submit(raw) {
     const cmd = raw.trim().toLowerCase().split(/\s+/)[0];
 
