@@ -1,9 +1,11 @@
-import { useEffect, useRef, useState } from "react";
+import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { technologyRegistry, getAllProjects, getProjectBySlug, resolveDetailedTechGroups } from "../lib/data";
 import { useInspect } from "../context/inspectState";
 import { forceLoad } from "./Deferred";
 
-const PROMPT = "PS C:\\wendrel>";
+// Exportado porque o CommandPanel (Hero) usa o mesmo prompt visual —
+// uma fonte só, os dois nunca divergem.
+export const PROMPT = "PS C:\\wendrel>";
 
 const HELP_LINES = [
   "help                  comandos disponíveis",
@@ -187,7 +189,10 @@ function runCommand(raw, inspect) {
 // Terminal deixou de ser uma feature independente do Hero e passou a ser a
 // camada que o Developer Mode abre. Não existe mais CTA de abrir o Terminal,
 // então também não existe mais onOpenChange.
-export default function Terminal({ open }) {
+// forwardRef só para expor fillCommand (usado pelo CommandPanel) — o
+// Terminal continua dono exclusivo do próprio estado, o ref não abre
+// nenhum outro método de escrita.
+const Terminal = forwardRef(function Terminal({ open }, ref) {
   const inspect = useInspect();
   const [lines, setLines] = useState([]);
   const [value, setValue] = useState("");
@@ -244,6 +249,16 @@ export default function Terminal({ open }) {
     );
     return () => [t1, t2].forEach(clearTimeout);
   }, [inspect.inspectMode]);
+
+  // Preenche o input (não executa) — usado pelo CommandPanel. setValue
+  // funciona mesmo antes do boot (input ainda não montado); o foco só
+  // pega efeito quando o input já existe no DOM.
+  useImperativeHandle(ref, () => ({
+    fillCommand(text) {
+      setValue(text);
+      inputRef.current?.focus();
+    },
+  }));
 
   function submit(raw) {
     const cmd = raw.trim().toLowerCase().split(/\s+/)[0];
@@ -343,4 +358,6 @@ export default function Terminal({ open }) {
       </div>
     </div>
   );
-}
+});
+
+export default Terminal;

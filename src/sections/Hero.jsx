@@ -1,28 +1,15 @@
 import { useEffect, useRef } from "react";
-import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from "framer-motion";
+import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { HiArrowRight } from "react-icons/hi";
 import GridBackground from "../components/GridBackground";
 import Terminal from "../components/Terminal";
+import CommandPanel from "../components/CommandPanel";
 import Bob from "../components/Bob/Bob";
-import { profile, portfolioInspectNotes, technologyRegistry } from "../lib/data";
+import { profile } from "../lib/data";
 import { useInspect } from "../context/inspectState";
 import MagneticButton from "../components/MagneticButton";
 import heroPhotoAvif from "../assets/hero-photo.avif";
 import heroPhotoWebp from "../assets/hero-photo.webp";
-
-// Linhas do painel Inspect do Hero — só fatos confirmados no código atual
-// (ver comentários no GridBackground.jsx e mais abaixo, no glow da foto).
-// stack vem do technologyRegistry (nunca digitado à mão); o resto é texto
-// fixo porque descreve comportamento de código, não dado de projeto.
-function heroInspectLines(notes) {
-  const stack = notes.stackTechIds.map((id) => technologyRegistry[id]?.name).join(" · ");
-  return [
-    { label: "STACK", value: stack },
-    { label: "MEDIA", value: notes.media },
-    { label: "MOBILE", value: notes.mobileGrid },
-    { label: "PHOTO", value: notes.photoGlow },
-  ];
-}
 
 // Controle principal do Developer Mode — vive perto do Bob (mobile e
 // desktop) porque é onde o efeito realmente acontece. Mesma fonte de
@@ -75,6 +62,10 @@ export default function Hero() {
   // futuro (ele descrevia "terminal aberto sem Inspect", combinação que a
   // entrada única eliminou).
   const bobState = inspectMode ? "inspect" : "idle";
+  // fillCommand vive no Terminal (useImperativeHandle) — o CommandPanel só
+  // preenche o input, nunca executa nada por conta própria.
+  const terminalRef = useRef(null);
+  const handleRunCommand = (command) => terminalRef.current?.fillCommand(command);
   const ref = useRef(null);
   const mx = useMotionValue(0);
   const my = useMotionValue(0);
@@ -222,25 +213,25 @@ export default function Hero() {
           </motion.div>
         </div>
 
-        {/* Prova técnica — o terminal vive na própria linha, sem disputar espaço com a foto.
-            Bob é assinatura secundária ao lado do terminal (não substitui foto/headline/CTA) —
-            entra junto no mesmo fade, sem animação de entrada própria. */}
+        {/* Developer Workspace — o Terminal e o Command Panel "ligam ao redor"
+            do Bob, que não se move entre OFF e ON. Duas colunas reais (grid,
+            não position:absolute): a coluna do Bob tem largura fixa (12rem)
+            e a coluna técnica é 1fr — como o container inteiro tem max-w
+            fixo, a coluna do Bob cai sempre no mesmo x, exista ou não
+            conteúdo do lado esquerdo. No mobile vira flex-col e a ordem é
+            controlada por `order` (Terminal → Bob → Command Panel). */}
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.4 }}
           className="mt-16 md:mt-20"
         >
-          {/* Empilhado no mobile (Bob abaixo do terminal, cada um com a
-              largura toda) — lado a lado só a partir de md, onde sobra
-              espaço real pros dois sem apertar/cortar o terminal. Com o
-              Developer Mode OFF o Terminal não renderiza nada e sobra só a
-              coluna do Bob, que justify-center centraliza sozinha — por isso
-              o Terminal carrega a própria largura em vez de um wrapper fixo,
-              que ficaria ocupando metade da linha vazio. */}
-          <div className="mx-auto flex max-w-3xl flex-col items-center justify-center gap-4 md:flex-row md:items-end">
-            <Terminal open={terminalOpen} />
-            <div className="flex shrink-0 flex-col items-center gap-1.5 md:pb-6">
+          <div className="mx-auto flex max-w-4xl flex-col items-center gap-4 md:grid md:grid-cols-[1fr_12rem] md:items-start md:gap-8">
+            <div className="order-1 w-full md:col-start-1 md:row-start-1">
+              <Terminal ref={terminalRef} open={terminalOpen} />
+            </div>
+
+            <div className="order-2 flex w-full shrink-0 flex-col items-center gap-1.5 md:col-start-2 md:row-start-1 md:row-span-2 md:self-start">
               {/* interactive: o próprio Bob já faz o gate completo (hover:hover +
                   pointer:fine + !reduced-motion) em canFollowPointer() — não
                   duplicar matchMedia aqui, uma fonte de regra só. */}
@@ -250,33 +241,14 @@ export default function Hero() {
               </p>
               <DevModeButton />
             </div>
+
+            {terminalOpen && (
+              <div className="order-3 w-full md:col-start-1 md:row-start-2">
+                <CommandPanel onRunCommand={handleRunCommand} />
+              </div>
+            )}
           </div>
         </motion.div>
-
-        {/* Camada técnica opcional — só existe quando Inspect está ligado
-            (Navbar). Sem blur/filter, só opacity + translate curto. */}
-        <AnimatePresence initial={false}>
-          {inspectMode && (
-            <motion.div
-              key="hero-inspect"
-              initial={{ opacity: 0, y: -6 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -6 }}
-              transition={{ duration: 0.18 }}
-              className="mx-auto mt-6 max-w-2xl rounded-xl border border-base-border bg-base-surface/40 p-4 font-mono text-[11px] text-ink-muted"
-            >
-              <p className="text-[10px] uppercase tracking-widest text-signal-blue">[ hero ]</p>
-              <dl className="mt-2 flex flex-col gap-1.5">
-                {heroInspectLines(portfolioInspectNotes.hero).map((line) => (
-                  <div key={line.label} className="flex flex-wrap gap-x-2">
-                    <dt className="shrink-0 text-ink-faint">{line.label}</dt>
-                    <dd>{line.value}</dd>
-                  </div>
-                ))}
-              </dl>
-            </motion.div>
-          )}
-        </AnimatePresence>
       </div>
     </section>
   );

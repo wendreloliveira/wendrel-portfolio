@@ -3,7 +3,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import { HiOutlineMenu, HiX } from "react-icons/hi";
 import avatarAvif from "../assets/avatar.avif";
 import avatarWebp from "../assets/avatar.webp";
-import { useInspect } from "../context/inspectState";
 
 const LINKS = [
   { label: "Sobre", href: "#sobre" },
@@ -12,32 +11,6 @@ const LINKS = [
   { label: "Tecnologias", href: "#tecnologias" },
   { label: "Contato", href: "#contato" },
 ];
-
-// Atalho compacto do Developer Mode — "abrir o capô", não "ligar um painel
-// de debug". Mesma fonte de estado (toggleDevMode) do botão maior perto do
-// Bob no Hero, então os dois nunca divergem. Só existe no desktop agora —
-// no mobile o controle principal fica junto do Bob, onde o efeito acontece
-// (menos descoberta perdida do que dentro do menu). aria-pressed carrega o
-// estado pra leitor de tela; o dot + cor carregam pra quem enxerga.
-function DevModeToggle() {
-  const { inspectMode, toggleDevMode } = useInspect();
-  return (
-    <button
-      type="button"
-      onClick={toggleDevMode}
-      aria-pressed={inspectMode}
-      className={`inline-flex items-center gap-1.5 rounded-full border px-3.5 py-2 font-mono text-xs transition-colors duration-150 ${
-        inspectMode
-          ? "border-signal-blue/50 bg-signal-blue/10 text-signal-blue"
-          : "border-base-border text-ink-muted hover:border-ink-faint hover:text-ink"
-      }`}
-    >
-      <span aria-hidden="true">{"</>"}</span>
-      Dev Mode
-      {inspectMode && <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-signal-blue" />}
-    </button>
-  );
-}
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
@@ -89,7 +62,6 @@ export default function Navbar() {
         </nav>
 
         <div className="hidden items-center gap-3 md:flex">
-          <DevModeToggle />
           <a
             href="#contato"
             className="rounded-full border border-base-border bg-base-elevated px-4 py-2 text-sm font-medium text-ink transition-all hover:border-signal-blue/50 hover:bg-base-elevated/80"
