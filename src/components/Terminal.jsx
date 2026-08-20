@@ -170,7 +170,9 @@ function runCommand(raw, inspect) {
 
 // Console interativo do Hero — funcionalidade real, não decoração.
 // Estado local simples: histórico de linhas renderizadas + input controlado.
-export default function Terminal() {
+// Terminal continua dono do próprio `isOpen` — `onOpenChange` só notifica um
+// ancestral (ex.: Bob, no Hero) sem exigir Context/Provider novo pra isso.
+export default function Terminal({ onOpenChange }) {
   const inspect = useInspect();
   const [lines, setLines] = useState([]);
   const [value, setValue] = useState("");
@@ -184,6 +186,11 @@ export default function Terminal() {
   // re-render a cada tecla, por isso fica em ref e não em state.
   const commandHistory = useRef([]);
   const historyIndex = useRef(0);
+
+  useEffect(() => {
+    onOpenChange?.(isOpen);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen]);
 
   // Sequência automática de boot: digita "whoami" sozinho, mostra a saída e
   // só então libera o controle para o visitante.

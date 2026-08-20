@@ -1,8 +1,9 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { HiArrowRight } from "react-icons/hi";
 import GridBackground from "../components/GridBackground";
 import Terminal from "../components/Terminal";
+import Bob from "../components/Bob/Bob";
 import { profile, portfolioInspectNotes, technologyRegistry } from "../lib/data";
 import { useInspect } from "../context/inspectState";
 import MagneticButton from "../components/MagneticButton";
@@ -25,6 +26,15 @@ function heroInspectLines(notes) {
 
 export default function Hero() {
   const { inspectMode } = useInspect();
+  // Terminal continua dono do próprio `isOpen` — só espelha aqui via
+  // onOpenChange, sem Provider novo (Bob e Terminal são ambos filhos diretos
+  // do Hero, então esse é o ancestral comum mínimo).
+  const [terminalOpen, setTerminalOpen] = useState(false);
+  // Mesmo padrão que o próprio Terminal já usa pro isOpen inicial — lido
+  // uma vez no mount, sem listener de resize.
+  const [bobSize] = useState(() => (typeof window !== "undefined" && window.innerWidth >= 768 ? "md" : "sm"));
+  // Prioridade fixa: Inspect > Terminal aberto > idle (seção 6 do brief).
+  const bobState = inspectMode ? "inspect" : terminalOpen ? "active" : "idle";
   const ref = useRef(null);
   const mx = useMotionValue(0);
   const my = useMotionValue(0);
@@ -172,14 +182,29 @@ export default function Hero() {
           </motion.div>
         </div>
 
-        {/* Prova técnica — o terminal vive na própria linha, sem disputar espaço com a foto. */}
+        {/* Prova técnica — o terminal vive na própria linha, sem disputar espaço com a foto.
+            Bob é assinatura secundária ao lado do terminal (não substitui foto/headline/CTA) —
+            entra junto no mesmo fade, sem animação de entrada própria. */}
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.4 }}
           className="mt-16 md:mt-20"
         >
-          <Terminal />
+          {/* Empilhado no mobile (Bob abaixo do terminal, cada um com a
+              largura toda) — lado a lado só a partir de md, onde sobra
+              espaço real pros dois sem apertar/cortar o terminal. */}
+          <div className="mx-auto flex max-w-3xl flex-col items-center justify-center gap-4 md:flex-row md:items-end">
+            <div className="w-full max-w-2xl">
+              <Terminal onOpenChange={setTerminalOpen} />
+            </div>
+            <div className="flex shrink-0 flex-col items-center gap-1.5 md:pb-6">
+              <Bob state={bobState} size={bobSize} interactive={false} />
+              <p className="text-center font-mono text-[10px] uppercase tracking-wide text-ink-faint">
+                Bob — Terminal Bot
+              </p>
+            </div>
+          </div>
         </motion.div>
 
         {/* Camada técnica opcional — só existe quando Inspect está ligado
