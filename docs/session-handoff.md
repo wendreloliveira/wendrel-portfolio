@@ -102,6 +102,13 @@ Branches de diagnóstico preservadas (não deletar ainda): `diag/mobile-paint-st
 - `aria-live="polite"` na saída;
 - sem dependência nova.
 
+## V2.5 — Bob / Terminal Bot + Developer Mode
+
+- **Bob:** identidade visual "Terminal Bot", componente SVG leve (`Bob.jsx`/`BobFace.jsx`/`bobStates.js`), sem texto/webfont — o glifo é sempre vetor. Estados definidos no componente: `idle`, `active`, `thinking`, `inspect`, `error`, `sleep`; nesta UX só `idle` e `inspect` são de fato alcançados (os demais existem para uso futuro, não estão em uso no portfólio hoje).
+- **Developer Mode:** nome de UX para a camada técnica opcional. `inspectMode` (`InspectProvider`) continua sendo a única fonte técnica de verdade — sem boolean paralelo. `enableDevMode`/`disableDevMode` coordenam Bob + Terminal + Inspect Mode juntos; é a única entrada visual do Terminal no Hero hoje (chip da Navbar e botão do Hero lêem/escrevem o mesmo estado, nunca divergem).
+- **Terminal:** deixou de ser feature independente do Hero — sem CTA próprio de abrir/fechar, abre e fecha só junto com o Developer Mode. Mini-boot curto (`init dev-mode` / `Developer Mode enabled.`) toca somente na transição OFF → ON. Comandos preservados: `help`, `whoami`, `about`, `projects`, `stack <projeto>`, `skills [categoria]`, `inspect [on|off]`, `open <projeto>`, `visit <projeto>`, `contact`, `clear`; histórico ArrowUp/ArrowDown mantido.
+- **Mobile / Safari:** nenhuma primitiva nova de risco — sem filter/blur/backdrop-filter/perspective/will-change/listener global/RAF próprio. Bob usa `onPointerMove` só no próprio SVG, restrito a `hover:hover` + `pointer:fine` + `!prefers-reduced-motion`. Input do Terminal usa `text-base` (16px) em todos os breakpoints para evitar o auto-zoom de foco do Safari/iOS (independente de largura, cobre landscape também) e tem `color` explícito, reaproveitando a mesma cor já usada no resto do Terminal, para ficar legível durante a digitação. Pinch-zoom manual preservado; os fixes de blur do `GridBackground` e do glow da foto do Hero (ver acima) não foram alterados.
+
 ## Próxima fase
 
 Nenhuma pendência aberta. Deployed em https://wendrel-portfolio.vercel.app, com metadados de produção finalizados e os dois bugs de mobile Safari corrigidos.
