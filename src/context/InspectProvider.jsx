@@ -3,11 +3,6 @@ import { InspectContext } from "./inspectState";
 
 export function InspectProvider({ children }) {
   const [inspectMode, setInspectMode] = useState(false);
-  // Só uma Detailed Stack aberta por vez, atravessando featured e secondary
-  // — é um acordeão único, não um por projeto. Fica aqui (não em cada
-  // TechStackInspect) porque "Inspect ligado" e "qual projeto está aberto"
-  // são a mesma feature, e desligar Inspect precisa resetar os dois juntos.
-  const [openProjectId, setOpenProjectId] = useState(null);
   // Terminal não é mais uma feature independente do Hero: Developer Mode é a
   // única porta de entrada da camada técnica. terminalOpen continua existindo
   // como estado próprio (o Terminal ainda precisa saber se está aberto), mas
@@ -26,8 +21,6 @@ export function InspectProvider({ children }) {
     }
     function disableInspect() {
       setInspectMode(false);
-      // Nunca reabre uma Detailed Stack sozinha ao ligar de novo.
-      setOpenProjectId(null);
     }
     // Developer Mode = Inspect + Terminal orquestrados como uma coisa só.
     // Toda entrada e saída da camada técnica passa por estas duas funções.
@@ -58,18 +51,15 @@ export function InspectProvider({ children }) {
     }
     return {
       inspectMode,
-      openProjectId,
       terminalOpen,
       enableInspect,
       disableInspect,
-      toggleProjectInspect: (slug) => setOpenProjectId((current) => (current === slug ? null : slug)),
-      closeProjectInspect: () => setOpenProjectId(null),
       enableDevMode,
       disableDevMode,
       requestDevModeOff,
       toggleDevMode: () => (inspectMode ? disableDevMode() : enableDevMode()),
     };
-  }, [inspectMode, openProjectId, terminalOpen]);
+  }, [inspectMode, terminalOpen]);
 
   return <InspectContext.Provider value={value}>{children}</InspectContext.Provider>;
 }

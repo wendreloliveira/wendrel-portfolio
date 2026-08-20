@@ -3,6 +3,9 @@ import { HiChevronLeft, HiChevronRight, HiOutlineExternalLink, HiOutlinePlay } f
 import Reveal from "./Reveal";
 import MediaPlaceholder from "./MediaPlaceholder";
 import ProjectMediaViewer from "./ProjectMediaViewer";
+import ProjectPreview from "./ProjectPreview";
+import ProjectDisclosure from "./ProjectDisclosure";
+import TechSignature from "./TechSignature";
 import TechStackInspect from "./TechStackInspect";
 import { useTechGraph, hasFineHover, relationState } from "../context/graphState";
 
@@ -25,14 +28,6 @@ function Field({ label, children }) {
       <p className="font-mono text-[11px] uppercase tracking-widest text-signal-blue">{label}</p>
       <p className="mt-1.5 text-sm leading-relaxed text-ink-muted">{children}</p>
     </div>
-  );
-}
-
-function Tag({ children }) {
-  return (
-    <span className="rounded-md border border-base-border bg-base-elevated px-2.5 py-1 font-mono text-[11px] text-ink-muted">
-      {children}
-    </span>
   );
 }
 
@@ -93,7 +88,7 @@ function MediaCaptionBar({ images, activeIndex, viewerRef, projectTitle }) {
 // Estudo de caso — design system único para todos os projetos em destaque.
 // A identidade de cada um vem do conteúdo (screenshots, copy, status,
 // stack), não de uma estrutura de layout diferente por projeto.
-export default function ProjectCase({ project, index }) {
+export default function ProjectCase({ project, index, isExpanded, onToggleExpand }) {
   const {
     slug,
     title,
@@ -104,7 +99,6 @@ export default function ProjectCase({ project, index }) {
     problem,
     role,
     decisions,
-    stack,
     primaryTechIds,
     status,
     statusColor,
@@ -113,6 +107,7 @@ export default function ProjectCase({ project, index }) {
     liveCtaLabel,
     livePreview,
   } = project;
+  const panelId = `project-more-${slug}`;
   const images = project.media?.desktop || [];
   const viewerRef = useRef(null);
   const [activeIndex, setActiveIndex] = useState(0);
@@ -178,37 +173,18 @@ export default function ProjectCase({ project, index }) {
             <p className="mt-3 font-mono text-[11px] uppercase tracking-wide text-ink-faint">{highlights.join(" · ")}</p>
           )}
 
-          {stack?.length > 0 && (
-            <div className="mt-4 flex flex-wrap gap-2">
-              {stack.map((tech) => (
-                <Tag key={tech}>{tech}</Tag>
-              ))}
-            </div>
-          )}
-        </div>
+          {/* Modo normal + recolhido: zero stack. Developer Mode + recolhido
+              (estado C): assinatura compacta só de primaryTechIds. */}
+          {!isExpanded && <TechSignature project={project} />}
 
-        <div className="mx-auto mt-8 max-w-5xl sm:mt-10">
-          {images.length > 0 ? (
-            <>
-              <ProjectMediaViewer
-                ref={viewerRef}
-                images={images}
-                projectTitle={title}
-                aspectClassName="aspect-video"
-                showArrows={false}
-                showDots={false}
-                onIndexChange={setActiveIndex}
-              />
-              <MediaCaptionBar images={images} activeIndex={activeIndex} viewerRef={viewerRef} projectTitle={title} />
-            </>
-          ) : (
-            <MediaPlaceholder className="aspect-video w-full" label={`${title} — aguardando mídia real`} />
+          {/* Recolhido: só a capa, mesmo tratamento do SecondaryProjectCard —
+              o carrossel completo é conteúdo de "Ver mais" (estado B/D). */}
+          {!isExpanded && (
+            <ProjectPreview image={project.media?.cover} alt={project.media?.coverAlt} title={title} />
           )}
-        </div>
 
-        <div className="mx-auto mt-8 max-w-3xl sm:mt-10">
           {liveUrl && (
-            <div className="flex flex-wrap items-center gap-3">
+            <div className="mt-4 flex flex-wrap items-center gap-3">
               <a
                 href={liveUrl}
                 target="_blank"
@@ -231,48 +207,64 @@ export default function ProjectCase({ project, index }) {
               </button>
             </div>
           )}
+        </div>
 
-          <div className="mt-10 grid gap-8 lg:grid-cols-2 lg:gap-10">
-            <Field label="Contexto">{contextText}</Field>
-            <Field label="Minha participação">{role}</Field>
+        <ProjectDisclosure id={panelId} isExpanded={isExpanded} onToggle={() => onToggleExpand(slug)}>
+          <div className="mx-auto mt-8 max-w-5xl sm:mt-10">
+            {images.length > 0 ? (
+              <>
+                <ProjectMediaViewer
+                  ref={viewerRef}
+                  images={images}
+                  projectTitle={title}
+                  aspectClassName="aspect-video"
+                  showArrows={false}
+                  showDots={false}
+                  onIndexChange={setActiveIndex}
+                />
+                <MediaCaptionBar images={images} activeIndex={activeIndex} viewerRef={viewerRef} projectTitle={title} />
+              </>
+            ) : (
+              <MediaPlaceholder className="aspect-video w-full" label={`${title} — aguardando mídia real`} />
+            )}
           </div>
 
-          {decisions?.length > 0 && (
-            <div className="mt-8">
-              <p className="font-mono text-[11px] uppercase tracking-widest text-signal-blue">Principais decisões</p>
-              <ol className="mt-3 flex flex-col gap-2.5">
-                {decisions.map((d, i) => (
-                  <li key={d} className="flex gap-3 text-sm leading-relaxed text-ink-muted">
-                    <span className="shrink-0 font-mono text-ink-faint">{String(i + 1).padStart(2, "0")}</span>
-                    <span>{d}</span>
-                  </li>
-                ))}
-              </ol>
+          <div className="mx-auto mt-8 max-w-3xl sm:mt-10">
+            <div className="grid gap-8 lg:grid-cols-2 lg:gap-10">
+              <Field label="Contexto">{contextText}</Field>
+              <Field label="Minha participação">{role}</Field>
             </div>
-          )}
 
-          {stack?.length > 0 && (
-            <div className="mt-8">
-              <p className="font-mono text-[11px] uppercase tracking-widest text-signal-blue">Stack</p>
-              <div className="mt-3 flex flex-wrap gap-2">
-                {stack.map((tech) => (
-                  <Tag key={tech}>{tech}</Tag>
+            {decisions?.length > 0 && (
+              <div className="mt-8">
+                <p className="font-mono text-[11px] uppercase tracking-widest text-signal-blue">Principais decisões</p>
+                <ol className="mt-3 flex flex-col gap-2.5">
+                  {decisions.map((d, i) => (
+                    <li key={d} className="flex gap-3 text-sm leading-relaxed text-ink-muted">
+                      <span className="shrink-0 font-mono text-ink-faint">{String(i + 1).padStart(2, "0")}</span>
+                      <span>{d}</span>
+                    </li>
+                  ))}
+                </ol>
+              </div>
+            )}
+
+            {/* Developer Mode + expandido (estado D): stack detalhada uma
+                única vez — TechStackInspect se auto-gate em inspectMode, a
+                assinatura compacta some porque !isExpanded é falso aqui. */}
+            <TechStackInspect project={project} />
+
+            {links?.length > 0 && (
+              <div className="mt-6 flex flex-wrap gap-4">
+                {links.map((link) => (
+                  <a key={link.href} href={link.href} target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-signal-blue hover:underline">
+                    {link.label}
+                  </a>
                 ))}
               </div>
-              <TechStackInspect project={project} />
-            </div>
-          )}
-
-          {links?.length > 0 && (
-            <div className="mt-6 flex flex-wrap gap-4">
-              {links.map((link) => (
-                <a key={link.href} href={link.href} target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-signal-blue hover:underline">
-                  {link.label}
-                </a>
-              ))}
-            </div>
-          )}
-        </div>
+            )}
+          </div>
+        </ProjectDisclosure>
 
         {hasOpenedPreview && (
           <Suspense fallback={null}>

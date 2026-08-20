@@ -69,7 +69,7 @@ export const technologyRegistry = {
 // ordem dada. `stack` (consumida hoje por ProjectCase/SecondaryProjectCard)
 // continua sendo um array de strings, só que derivado do registry — nunca
 // mais digitado à mão.
-function resolveTechNames(ids) {
+export function resolveTechNames(ids) {
   return ids.map((id) => technologyRegistry[id]?.name).filter(Boolean);
 }
 

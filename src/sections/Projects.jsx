@@ -1,6 +1,9 @@
+import { useState } from "react";
 import Reveal from "../components/Reveal";
 import ProjectPreview from "../components/ProjectPreview";
 import ProjectCase from "../components/ProjectCase";
+import ProjectDisclosure from "../components/ProjectDisclosure";
+import TechSignature from "../components/TechSignature";
 import TechStackInspect from "../components/TechStackInspect";
 import { featuredProjects, secondaryProjects } from "../lib/data";
 import { useTechGraph, hasFineHover, relationState } from "../context/graphState";
@@ -18,16 +21,17 @@ const CARD_BORDER = {
 // Mesma estrutura para todos — só conteúdo/imagem/tags/categoria/status
 // mudam. Numeração continua a dos projetos em destaque (offset = quantos
 // featured existem), então não precisa de ajuste manual se esse número mudar.
-function SecondaryProjectCard({ project, index, numberOffset }) {
+function SecondaryProjectCard({ project, index, numberOffset, isExpanded, onToggleExpand }) {
   const { activeTechId, activeProjectId, relatedProjectSlugs, setActiveProject, clearActiveProject } = useTechGraph();
   const state = relationState({
     isActive: activeProjectId === project.slug,
     isRelated: relatedProjectSlugs.includes(project.slug),
     anyActive: !!activeTechId || !!activeProjectId,
   });
+  const panelId = `project-more-${project.slug}`;
 
   return (
-    <Reveal delay={index * 0.06} className="h-full">
+    <Reveal delay={index * 0.06}>
       <article
         id={project.slug}
         onMouseEnter={() => {
@@ -44,7 +48,11 @@ function SecondaryProjectCard({ project, index, numberOffset }) {
         onBlur={(e) => {
           if (!e.currentTarget.contains(e.relatedTarget)) clearActiveProject();
         }}
-        className={`flex h-full scroll-mt-24 flex-col rounded-2xl border ${CARD_BORDER[state]} bg-base-surface/50 p-6 transition-[border-color,opacity] duration-150 hover:border-signal-blue/30 ${
+        // Sem h-full: com só 2 secondary projects numa única linha de grid,
+        // stretch faria expandir um card esticar o vizinho fechado (espaço
+        // morto embaixo). items-start no grid (abaixo) + altura natural
+        // aqui deixam cada card crescer sozinho quando expande.
+        className={`flex scroll-mt-24 flex-col rounded-2xl border ${CARD_BORDER[state]} bg-base-surface/50 p-6 transition-[border-color,opacity] duration-150 hover:border-signal-blue/30 ${
           state === "dimmed" ? "opacity-55" : "opacity-100"
         }`}
       >
@@ -64,41 +72,45 @@ function SecondaryProjectCard({ project, index, numberOffset }) {
 
         <ProjectPreview image={project.media?.cover} alt={project.media?.coverAlt} title={project.title} />
 
-        {project.role && (
-          <div>
-            <p className="font-mono text-[10px] uppercase tracking-widest text-ink-faint">Participação</p>
-            <p className="mt-1 text-sm leading-relaxed text-ink-muted">{project.role}</p>
+        {/* Recolhido + Developer Mode ON (estado C): assinatura compacta só
+            de primaryTechIds — zero chips no modo normal (estado A). */}
+        {!isExpanded && <TechSignature project={project} />}
+
+        <ProjectDisclosure
+          id={panelId}
+          isExpanded={isExpanded}
+          onToggle={() => onToggleExpand(project.slug)}
+          wrapperClassName=""
+        >
+          <div className="flex flex-col gap-4">
+            {project.role && (
+              <div>
+                <p className="font-mono text-[10px] uppercase tracking-widest text-ink-faint">Participação</p>
+                <p className="mt-1 text-sm leading-relaxed text-ink-muted">{project.role}</p>
+              </div>
+            )}
+
+            {/* Expandido + Developer Mode ON (estado D): stack detalhada uma
+                única vez, nunca junto da assinatura compacta. */}
+            <TechStackInspect project={project} />
+
+            {project.links?.length > 0 && (
+              <div className="flex flex-wrap gap-4">
+                {project.links.map((link) => (
+                  <a
+                    key={link.href}
+                    href={link.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm font-medium text-signal-blue hover:underline"
+                  >
+                    {link.label}
+                  </a>
+                ))}
+              </div>
+            )}
           </div>
-        )}
-
-        <div className="mt-4 flex flex-wrap gap-2">
-          {project.stack.map((tech) => (
-            <span
-              key={tech}
-              className="rounded-md border border-base-border bg-base-elevated px-2.5 py-1 font-mono text-[11px] text-ink-muted"
-            >
-              {tech}
-            </span>
-          ))}
-        </div>
-
-        <TechStackInspect project={project} />
-
-        {project.links?.length > 0 && (
-          <div className="mt-4 flex flex-wrap gap-4">
-            {project.links.map((link) => (
-              <a
-                key={link.href}
-                href={link.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-sm font-medium text-signal-blue hover:underline"
-              >
-                {link.label}
-              </a>
-            ))}
-          </div>
-        )}
+        </ProjectDisclosure>
       </article>
     </Reveal>
   );
@@ -106,6 +118,10 @@ function SecondaryProjectCard({ project, index, numberOffset }) {
 
 export default function Projects() {
   const sortedFeatured = [...featuredProjects].sort((a, b) => a.order - b.order);
+  // Um único "Ver mais" aberto por vez, atravessando featured e secondary —
+  // menor ancestral comum de ambas as listas, sem Provider novo só pra isso.
+  const [expandedProjectId, setExpandedProjectId] = useState(null);
+  const toggleExpanded = (slug) => setExpandedProjectId((current) => (current === slug ? null : slug));
 
   return (
     <section className="relative overflow-hidden border-t border-base-border py-28">
@@ -131,7 +147,13 @@ export default function Projects() {
 
         <div className="mt-4">
           {sortedFeatured.map((project, i) => (
-            <ProjectCase key={project.slug} project={project} index={i} />
+            <ProjectCase
+              key={project.slug}
+              project={project}
+              index={i}
+              isExpanded={expandedProjectId === project.slug}
+              onToggleExpand={toggleExpanded}
+            />
           ))}
         </div>
 
@@ -151,9 +173,16 @@ export default function Projects() {
             </p>
           </Reveal>
 
-          <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-10 grid items-start gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {secondaryProjects.map((project, i) => (
-              <SecondaryProjectCard key={project.slug} project={project} index={i} numberOffset={featuredProjects.length} />
+              <SecondaryProjectCard
+                key={project.slug}
+                project={project}
+                index={i}
+                numberOffset={featuredProjects.length}
+                isExpanded={expandedProjectId === project.slug}
+                onToggleExpand={toggleExpanded}
+              />
             ))}
           </div>
         </div>
