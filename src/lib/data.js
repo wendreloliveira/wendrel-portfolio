@@ -403,9 +403,17 @@ export const timeline = [
 // Nome e categoria vêm do technologyRegistry por `techId` — `usage` é a
 // única camada editorial própria desta seção, então nenhuma tecnologia tem
 // `name: "Flask"` (ou similar) escrito em duas fontes diferentes.
-// "SQL" é a única exceção: é um rótulo genérico do contexto PIEMP sem uma
-// tecnologia canônica específica confirmada por trás, então fica fora do
-// registry e usa `name` literal em vez de `techId`.
+// "SQL" é a única exceção: rótulo genérico do contexto PIEMP, sem
+// tecnologia canônica confirmada por trás. Reauditado na V2.7B: nenhum
+// projeto declara "sql" em primaryTechIds/techGroups — PIEMP não é um
+// projeto próprio (é o programa citado em `timeline`/no `context` do
+// EmpregaAI), e o `techGroups.Dados` do EmpregaAI só lista postgresql e
+// sqlalchemy, tecnologias canônicas com identidade própria. Sem um campo
+// estruturado por projeto que sustente "SQL" como entidade distinta,
+// continua fora do registry por decisão, não por lacuna — evita inflar o
+// grafo com um nó sem relação factual (isso criaria SQL → NABOA/EmpregaAI
+// só porque ambos usam PostgreSQL, exatamente a inferência que este
+// registry existe pra impedir).
 export const technologyGroups = [
   {
     category: "Front-end",
