@@ -1,40 +1,22 @@
 import { useEffect, useRef, useState } from "react";
-import { technologyGroups, technologyRegistry, featuredProjects } from "../lib/data";
+import { technologyRegistry, getAllProjects, getProjectBySlug, resolveDetailedTechGroups } from "../lib/data";
+import { useInspect } from "../context/inspectState";
 import { forceLoad } from "./Deferred";
 
 const PROMPT = "PS C:\\wendrel>";
 
-// liveUrl vem de data.js (fonte única) — só quem tem MVP publicado
-// (empregaai/naboa/risk/dkastro) recebe um, então "visit" só existe pra esses.
-function liveUrlOf(slug) {
-  return featuredProjects.find((p) => p.slug === slug)?.liveUrl;
-}
-
-// Mesma ordem da seção Projects (ver "order" em featuredProjects) — mantém
-// a numeração do comando "projects" consistente com o que a pessoa vê na página.
-const OPENABLE = [
-  { slug: "risk", label: "RISK", type: "projeto empresarial", liveUrl: liveUrlOf("risk") },
-  { slug: "naboa", label: "NABOA Streetwear", type: "e-commerce / full stack", liveUrl: liveUrlOf("naboa") },
-  { slug: "dkastro", label: "DKastro", type: "frontend / motion", liveUrl: liveUrlOf("dkastro") },
-  { slug: "empregaai", label: "EmpregaAI", type: "produto / software", liveUrl: liveUrlOf("empregaai") },
-  { slug: "vassvegas", label: "VassVegas", type: "produto multidisciplinar" },
-];
-
-// Largura da coluna do comando "projects" — calculada a partir do maior
-// label, não fixa, pra não quebrar de novo quando um nome mais comprido
-// (tipo "NABOA Streetwear") entrar na lista.
-const maxLabelLength = Math.max(...OPENABLE.map((p) => p.label.length));
-
 const HELP_LINES = [
-  "help              lista os comandos",
-  "whoami            quem eu sou",
-  "about             resumo profissional",
-  "projects          projetos reais",
-  "stack             tecnologias por uso real",
-  "open <projeto>    abre um case (risk, naboa, dkastro, empregaai, vassvegas)",
-  "visit <projeto>   abre o MVP publicado em nova aba (risk, naboa, dkastro, empregaai)",
-  "contact           vai até o contato",
-  "clear             limpa o terminal",
+  "help                  comandos disponíveis",
+  "whoami                quem eu sou",
+  "about                 resumo profissional",
+  "projects              listar projetos",
+  "stack <projeto>       stack técnica do projeto",
+  "skills [categoria]    tecnologias por categoria",
+  "inspect [on|off]      Inspect Mode",
+  "open <projeto>        navega até o case",
+  "visit <projeto>       abre o MVP publicado em nova aba",
+  "contact               vai até o contato",
+  "clear                 limpa o terminal",
 ];
 
 // Navegação por id. As seções abaixo da dobra são deferred (Deferred.jsx):
@@ -47,10 +29,12 @@ const HELP_LINES = [
 function goToSection(id) {
   forceLoad(id);
   const start = performance.now();
+  const reducedMotion =
+    typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   function attempt() {
     const el = document.getElementById(id);
     if (el) {
-      el.scrollIntoView({ behavior: "smooth", block: "start" });
+      el.scrollIntoView({ behavior: reducedMotion ? "auto" : "smooth", block: "start" });
       return;
     }
     if (performance.now() - start < 2000) setTimeout(attempt, 50);
@@ -58,10 +42,12 @@ function goToSection(id) {
   attempt();
 }
 
-// Parser de comandos: recebe a linha crua, decide o que fazer e devolve as
-// linhas de saída a exibir. "clear" é tratado à parte pelo componente (não
-// imprime nada, só limpa o histórico) — aqui ele nunca chega.
-function runCommand(raw) {
+// Parser de comandos: recebe a linha crua + a API do InspectProvider (só o
+// comando "inspect" usa) e devolve as linhas de saída. "clear" é tratado à
+// parte pelo componente (não imprime nada, só limpa o histórico) — aqui ele
+// nunca chega. Projetos/stacks/skills vêm sempre da Data Truth Layer
+// (data.js) — nenhum nome, slug, status ou categoria é digitado aqui.
+function runCommand(raw, inspect) {
   const [cmd, ...args] = raw.trim().toLowerCase().split(/\s+/);
 
   switch (cmd) {
@@ -81,46 +67,100 @@ function runCommand(raw) {
         "de MVPs multidisciplinares a entregas para empresas.",
       ];
 
-    case "projects":
+    case "projects": {
+      const all = getAllProjects();
+      const width = Math.max(...all.map((p) => p.title.length)) + 2;
       return [
-        ...OPENABLE.map((p, i) => `${String(i + 1).padStart(2, "0")}  ${p.label.padEnd(maxLabelLength + 2)}${p.type}`),
+        ...all.map((p, i) => `${String(i + 1).padStart(2, "0")}  ${p.title.padEnd(width)}${p.status}`),
         "",
-        "digite 'open <projeto>' para ver o case (ex: open empregaai)",
+        "use 'stack <projeto>' ou 'open <projeto>' — ex: stack naboa",
       ];
+    }
 
-    case "stack":
-      return technologyGroups.flatMap((group) => [
-        group.category.toUpperCase(),
-        `  ${group.items.map((i) => (i.techId ? technologyRegistry[i.techId]?.name : i.name)).join(", ")}`,
-        "",
-      ]);
+    case "stack": {
+      const project = getProjectBySlug(args[0]);
+      if (!project) {
+        return [`projeto não encontrado: ${args[0] || ""}`, "use `projects` para listar os projetos disponíveis."];
+      }
+      const groups = resolveDetailedTechGroups(project);
+      const lines = [project.title.toUpperCase(), `primary   ${project.stack.join(" · ")}`, ""];
+      if (groups.length > 0) {
+        for (const group of groups) {
+          lines.push(group.label);
+          lines.push(`  ${group.technologies.map((t) => t.name).join(" · ")}`);
+        }
+      } else {
+        lines.push("detailed");
+        lines.push("  Detalhamento técnico não publicado.");
+      }
+      return lines;
+    }
+
+    case "skills": {
+      // Ordem natural: dedup preserva a primeira ocorrência de cada
+      // categoria no registry, que já está agrupado por área — sem lista
+      // de ordem hardcoded.
+      const allCategories = [...new Set(Object.values(technologyRegistry).map((t) => t.category))];
+      const namesInCategory = (cat) =>
+        Object.values(technologyRegistry)
+          .filter((t) => t.category === cat)
+          .map((t) => t.name);
+
+      if (!args[0]) {
+        return allCategories.flatMap((cat) => [cat, `  ${namesInCategory(cat).join(" · ")}`, ""]);
+      }
+
+      const names = namesInCategory(args[0]);
+      if (names.length === 0) {
+        return [`categoria não encontrada: ${args[0]}`, `categorias disponíveis: ${allCategories.join(" · ")}`];
+      }
+      return [args[0], names.join(" · ")];
+    }
+
+    case "inspect": {
+      const sub = args[0];
+      if (!sub) return [`Inspect Mode: ${inspect.inspectMode ? "ON" : "OFF"}`];
+      if (sub === "on") {
+        if (inspect.inspectMode) return ["Inspect Mode já está ativo."];
+        inspect.enableInspect();
+        return ["Inspect Mode ativado."];
+      }
+      if (sub === "off") {
+        if (!inspect.inspectMode) return ["Inspect Mode já está desativado."];
+        inspect.disableInspect();
+        return ["Inspect Mode desativado."];
+      }
+      return ["uso: inspect [on|off]"];
+    }
 
     case "contact":
       goToSection("contato");
       return ["abrindo contato..."];
 
     case "open": {
-      const target = OPENABLE.find((p) => p.slug === args[0]);
-      if (!target) {
+      const project = getProjectBySlug(args[0]);
+      if (!project) {
         return [
           `projeto não encontrado: ${args[0] || ""}`,
-          "use: open risk | naboa | dkastro | empregaai | vassvegas",
+          `use: open ${getAllProjects()
+            .map((p) => p.slug)
+            .join(" | ")}`,
         ];
       }
-      goToSection(target.slug);
-      return [`abrindo ${target.label}...`];
+      goToSection(project.slug);
+      return [`abrindo ${project.title}...`];
     }
 
     case "visit": {
-      const target = OPENABLE.find((p) => p.slug === args[0]);
-      if (!target || !target.liveUrl) {
-        return [
-          `MVP não encontrado: ${args[0] || ""}`,
-          "use: visit risk | naboa | dkastro | empregaai",
-        ];
+      const project = getProjectBySlug(args[0]);
+      if (!project || !project.liveUrl) {
+        const withLiveUrl = getAllProjects()
+          .filter((p) => p.liveUrl)
+          .map((p) => p.slug);
+        return [`MVP não encontrado: ${args[0] || ""}`, `use: visit ${withLiveUrl.join(" | ")}`];
       }
-      window.open(target.liveUrl, "_blank", "noopener,noreferrer");
-      return [`abrindo ${target.label} em nova aba...`];
+      window.open(project.liveUrl, "_blank", "noopener,noreferrer");
+      return [`abrindo ${project.title} em nova aba...`];
     }
 
     default:
@@ -131,6 +171,7 @@ function runCommand(raw) {
 // Console interativo do Hero — funcionalidade real, não decoração.
 // Estado local simples: histórico de linhas renderizadas + input controlado.
 export default function Terminal() {
+  const inspect = useInspect();
   const [lines, setLines] = useState([]);
   const [value, setValue] = useState("");
   const [booted, setBooted] = useState(false);
@@ -149,10 +190,11 @@ export default function Terminal() {
   useEffect(() => {
     const t1 = setTimeout(() => setLines([{ type: "input", text: "whoami" }]), 500);
     const t2 = setTimeout(() => {
-      setLines((prev) => [...prev, ...runCommand("whoami").map((text) => ({ type: "output", text }))]);
+      setLines((prev) => [...prev, ...runCommand("whoami", inspect).map((text) => ({ type: "output", text }))]);
     }, 950);
     const t3 = setTimeout(() => setBooted(true), 1050);
     return () => [t1, t2, t3].forEach(clearTimeout);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Mantém o terminal rolado para a última linha sempre que o histórico muda.
@@ -170,7 +212,7 @@ export default function Terminal() {
       return;
     }
 
-    const output = runCommand(raw).map((text) => ({ type: "output", text }));
+    const output = runCommand(raw, inspect).map((text) => ({ type: "output", text }));
     setLines((prev) => [...prev, { type: "input", text: raw }, ...output]);
   }
 
@@ -216,6 +258,7 @@ export default function Terminal() {
         <div
           ref={bodyRef}
           onClick={() => inputRef.current?.focus()}
+          aria-live="polite"
           className={`overflow-y-auto p-5 font-mono text-[13px] leading-relaxed transition-[max-height] duration-300 ${
             isOpen ? "max-h-[360px]" : "max-h-28"
           }`}

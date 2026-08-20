@@ -314,6 +314,19 @@ export const secondaryProjects = [
   stack: project.stack ?? resolveTechNames(project.primaryTechIds),
 }));
 
+// Ordem canônica de exibição: featured por `order`, depois secondary na
+// ordem declarada — única fonte de listagem/lookup de projeto (ex.: os
+// comandos `projects`/`stack`/`open` do Terminal). Evita qualquer lista
+// paralela de slug/título/categoria fora de data.js.
+export function getAllProjects() {
+  const sortedFeatured = [...featuredProjects].sort((a, b) => a.order - b.order);
+  return [...sortedFeatured, ...secondaryProjects];
+}
+
+export function getProjectBySlug(slug) {
+  return getAllProjects().find((project) => project.slug === slug);
+}
+
 // Tech ↔ Project Graph: única forma de perguntar "quais projetos usam X" —
 // nenhum componente deve comparar nomes de tecnologia ou manter um mapa à parte.
 function projectsUsingTech(techId) {
