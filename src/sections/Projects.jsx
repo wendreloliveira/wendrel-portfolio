@@ -23,11 +23,14 @@ const CARD_BORDER = {
 // mudam. Numeração continua a dos projetos em destaque (offset = quantos
 // featured existem), então não precisa de ajuste manual se esse número mudar.
 function SecondaryProjectCard({ project, index, numberOffset, isExpanded, onToggleExpand }) {
-  const { activeTechId, activeProjectId, relatedProjectSlugs, setActiveProject, clearActiveProject } = useTechGraph();
+  const { activeProjectId, relatedProjectSlugs, projectDimmingActive, setActiveProject, clearActiveProject } =
+    useTechGraph();
+  // anyActive usa projectDimmingActive: um tech ativo sem projeto
+  // relacionado publicado (ex.: SQL) não dimma a lista inteira de projetos.
   const state = relationState({
     isActive: activeProjectId === project.slug,
     isRelated: relatedProjectSlugs.includes(project.slug),
-    anyActive: !!activeTechId || !!activeProjectId,
+    anyActive: projectDimmingActive,
   });
   const panelId = `project-more-${project.slug}`;
 

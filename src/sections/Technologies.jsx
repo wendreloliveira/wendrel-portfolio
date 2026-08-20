@@ -59,54 +59,35 @@ export default function Technologies() {
                 <h3 className="font-mono text-xs uppercase tracking-widest text-signal-blue">{group.category}</h3>
                 <div className="mt-4 flex flex-col gap-4">
                   {group.items.map((item) => {
-                    // Nome vem do registry quando há techId; "SQL" usa o
-                    // `name` literal. Auditado na V2.7B: nenhum projeto tem
-                    // "sql" em primaryTechIds/techGroups (Dados usa
-                    // postgresql/sqlalchemy, tecnologias canônicas próprias;
-                    // "SQL" só existe como frase editorial genérica aqui).
-                    // Sem evidência estruturada por projeto, continua fora
-                    // do registry por decisão, não por lacuna — não vira
-                    // hover trigger nem ganha techId falso só pra "ativar".
-                    // Ainda assim participa do ESTADO AMBIENTAL da seção:
-                    // relationState() roda sempre, então "dimmed" se aplica
-                    // quando algo mais está ativo — só isso já tira o item
-                    // da aparência de "fora" da animação, sem fingir clique.
-                    const name = item.techId ? technologyRegistry[item.techId]?.name : item.name;
-                    const Icon = item.techId ? ICONS[item.techId] : null;
+                    // Todo item em technologyGroups tem techId — SQL virou
+                    // canônico na V2.7C (ver comentário acima da definição
+                    // de technologyGroups). Um só caminho pra todos, sem
+                    // branch especial por tecnologia.
+                    const name = technologyRegistry[item.techId]?.name;
+                    const Icon = ICONS[item.techId];
                     const state = relationState({
                       isActive: item.techId === activeTechId,
                       isRelated: relatedTechIds.includes(item.techId),
                       anyActive: !!activeTechId || !!activeProjectId,
                     });
-                    // Duas classNames deliberadamente diferentes: o item
-                    // canônico ganha a "caixa" hoverável/focável (-m-2 + p-2
-                    // cancelam o deslocamento visual, só ampliam a área de
-                    // toque) + fundo de estado; o item não-canônico só
-                    // participa da opacidade ambiental — sem caixa, sem
-                    // fundo de hover/active, sem outline de foco, pra não
-                    // parecer um controle que não é.
-                    const rowClassName = item.techId
-                      ? `-m-2 flex items-start gap-3 rounded-lg p-2 transition-[background-color,opacity] duration-150 ${ROW_BG[state]} ${
-                          state === "dimmed" ? "opacity-50" : "opacity-100"
-                        } focus-visible:outline focus-visible:outline-2 focus-visible:outline-signal-blue/60 focus-visible:outline-offset-2`
-                      : `flex items-start gap-3 transition-opacity duration-150 ${state === "dimmed" ? "opacity-50" : "opacity-100"}`;
                     return (
                       <div
-                        key={item.techId ?? item.name}
-                        tabIndex={item.techId ? 0 : undefined}
-                        onMouseEnter={
-                          item.techId
-                            ? () => {
-                                if (hasFineHover()) setActiveTech(item.techId);
-                              }
-                            : undefined
-                        }
-                        onMouseLeave={item.techId ? clearActiveTech : undefined}
-                        onFocus={item.techId ? () => setActiveTech(item.techId) : undefined}
-                        onBlur={item.techId ? clearActiveTech : undefined}
-                        aria-label={item.techId ? `Tecnologia: ${name}` : undefined}
-                        className={rowClassName}
+                        key={item.techId}
+                        tabIndex={0}
+                        onMouseEnter={() => {
+                          if (hasFineHover()) setActiveTech(item.techId);
+                        }}
+                        onMouseLeave={clearActiveTech}
+                        onFocus={() => setActiveTech(item.techId)}
+                        onBlur={clearActiveTech}
+                        aria-label={`Tecnologia: ${name}`}
+                        className={`-m-2 flex items-start gap-3 rounded-lg p-2 transition-[background-color,opacity] duration-150 ${ROW_BG[state]} ${
+                          state === "dimmed" ? "opacity-50" : "opacity-100"
+                        } focus-visible:outline focus-visible:outline-2 focus-visible:outline-signal-blue/60 focus-visible:outline-offset-2`}
                       >
+                        {/* Nem toda tecnologia tem um ícone de marca correspondente
+                            (ex.: SQL é linguagem/spec, não um produto com logo) —
+                            fallback genérico, não uma condição especial por item. */}
                         {Icon ? (
                           <Icon size={18} className="mt-0.5 shrink-0 text-ink-faint" />
                         ) : (
@@ -115,13 +96,17 @@ export default function Technologies() {
                         <div>
                           <p className="text-sm font-medium text-ink">{name}</p>
                           <p className="mt-0.5 text-sm leading-relaxed text-ink-muted">{item.usage}</p>
-                          {inspectMode && item.techId && (() => {
+                          {inspectMode && (() => {
+                            // Estado vazio explícito (em vez de esconder a
+                            // linha) pra qualquer tecnologia canônica sem
+                            // projeto relacionado publicado ainda — genérico,
+                            // não um caso especial de SQL.
                             const titles = getProjectTitlesByTechId(item.techId);
-                            return titles.length > 0 ? (
+                            return (
                               <p className="mt-1 font-mono text-[10px] text-ink-faint">
-                                Projetos: {titles.join(" · ")}
+                                Projetos: {titles.length > 0 ? titles.join(" · ") : "—"}
                               </p>
-                            ) : null;
+                            );
                           })()}
                         </div>
                       </div>

@@ -112,14 +112,17 @@ export default function ProjectCase({ project, index, isExpanded, onToggleExpand
   const viewerRef = useRef(null);
   const [activeIndex, setActiveIndex] = useState(0);
   const [previewOpen, setPreviewOpen] = useState(false);
-  const { activeTechId, activeProjectId, relatedProjectSlugs, setActiveProject, clearActiveProject } = useTechGraph();
+  const { activeProjectId, relatedProjectSlugs, projectDimmingActive, setActiveProject, clearActiveProject } =
+    useTechGraph();
   // Só opacidade aqui — ProjectCase é um case de página inteira (sem
   // "cartão"), então o contraste entre o dimmed e o resto já é o destaque;
   // não criamos borda/fundo novos nesta seção. Ver seção 11 do V2.2.
+  // anyActive usa projectDimmingActive (não activeTechId bruto) — um tech
+  // ativo sem relação publicada (ex.: SQL) não deve dimmar todo mundo.
   const graphState = relationState({
     isActive: activeProjectId === slug,
     isRelated: relatedProjectSlugs.includes(slug),
-    anyActive: !!activeTechId || !!activeProjectId,
+    anyActive: projectDimmingActive,
   });
   // Uma vez aberto, o modal continua montado mesmo fechado — senão a
   // animação de saída (AnimatePresence dentro do LivePreviewModal) é

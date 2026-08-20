@@ -53,6 +53,7 @@ export const technologyRegistry = {
   radix: { id: "radix", name: "Radix UI", category: "frontend" },
   python: { id: "python", name: "Python", category: "backend" },
   flask: { id: "flask", name: "Flask", category: "backend" },
+  sql: { id: "sql", name: "SQL", category: "data" },
   sqlalchemy: { id: "sqlalchemy", name: "SQLAlchemy", category: "data" },
   postgresql: { id: "postgresql", name: "PostgreSQL", category: "data" },
   alembic: { id: "alembic", name: "Alembic", category: "data" },
@@ -403,17 +404,19 @@ export const timeline = [
 // Nome e categoria vêm do technologyRegistry por `techId` — `usage` é a
 // única camada editorial própria desta seção, então nenhuma tecnologia tem
 // `name: "Flask"` (ou similar) escrito em duas fontes diferentes.
-// "SQL" é a única exceção: rótulo genérico do contexto PIEMP, sem
-// tecnologia canônica confirmada por trás. Reauditado na V2.7B: nenhum
-// projeto declara "sql" em primaryTechIds/techGroups — PIEMP não é um
-// projeto próprio (é o programa citado em `timeline`/no `context` do
-// EmpregaAI), e o `techGroups.Dados` do EmpregaAI só lista postgresql e
-// sqlalchemy, tecnologias canônicas com identidade própria. Sem um campo
-// estruturado por projeto que sustente "SQL" como entidade distinta,
-// continua fora do registry por decisão, não por lacuna — evita inflar o
-// grafo com um nó sem relação factual (isso criaria SQL → NABOA/EmpregaAI
-// só porque ambos usam PostgreSQL, exatamente a inferência que este
-// registry existe pra impedir).
+// "SQL" virou canônico na V2.7C, separando duas perguntas que a V2.7B
+// tinha fundido: (1) é uma skill real já apresentada no portfolio? — sim,
+// esta linha existe desde antes desta fase, é conteúdo do próprio dono do
+// portfolio; (2) tem edge comprovado com algum projeto específico? —
+// auditoria de repositório real (emprega-ai, único repo público
+// verificável da conta) não achou nenhuma string SQL crua: README só cita
+// SQLAlchemy/SQLite, e backend/app/{models,seed,services} usam só ORM
+// (db.session.add/query/commit — zero db.session.execute(text(...))). O
+// repositório da NABOA não está listado publicamente na conta auditada,
+// então também sem evidência verificável. Por isso SQL existe no registry
+// (skill), mas SEM nenhum projeto em primaryTechIds/techGroups (zero
+// edges) — getProjectSlugsByTechId("sql") retorna [] até existir evidência
+// real, não porque PostgreSQL/SQLAlchemy "contam" por si só.
 export const technologyGroups = [
   {
     category: "Front-end",
@@ -438,7 +441,7 @@ export const technologyGroups = [
     items: [
       { techId: "supabase", usage: "Autenticação, banco de dados e storage do VassVegas Campus." },
       { techId: "postgresql", usage: "Banco relacional de produção da NABOA, hospedado no Neon, com migrações via Alembic." },
-      { name: "SQL", usage: "Modelagem de dados em projetos como PIEMP e EmpregaAI." },
+      { techId: "sql", usage: "Modelagem de dados em projetos como PIEMP e EmpregaAI." },
     ],
   },
   {
