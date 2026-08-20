@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { HiArrowRight } from "react-icons/hi";
 import GridBackground from "../components/GridBackground";
@@ -29,10 +29,28 @@ function heroInspectLines(notes) {
 // estado que o chip da Navbar (toggleDevMode/inspectMode do InspectProvider),
 // então os dois nunca divergem. Texto muda com o estado porque este botão
 // precisa comunicar a ação disponível, diferente do chip compacto da Navbar.
+// É a única entrada visual do Terminal desde que o CTA "Abrir terminal" saiu.
 function DevModeButton() {
   const { inspectMode, toggleDevMode } = useInspect();
+  const buttonRef = useRef(null);
+  const wasInspectMode = useRef(inspectMode);
+
+  // Desligar pelo próprio botão já mantém o foco nele (o botão não desmonta).
+  // O caso a cobrir é o comando `inspect off`: o input focado desaparece
+  // junto com o Terminal e o foco cai no <body>. Aí o foco volta pro controle
+  // que sobrou, em vez de ficar no nada. Só quando o foco realmente se perdeu
+  // — nunca roubando de onde o visitante colocou (ex.: chip da Navbar).
+  useEffect(() => {
+    const turnedOff = wasInspectMode.current && !inspectMode;
+    wasInspectMode.current = inspectMode;
+    if (turnedOff && document.activeElement === document.body) {
+      buttonRef.current?.focus({ preventScroll: true });
+    }
+  }, [inspectMode]);
+
   return (
     <button
+      ref={buttonRef}
       type="button"
       onClick={toggleDevMode}
       aria-pressed={inspectMode}
@@ -49,11 +67,14 @@ function DevModeButton() {
 }
 
 export default function Hero() {
-  // terminalOpen agora vive no InspectProvider (Developer Mode precisa abrir
-  // e fechar o Terminal, não só observar) — Hero só consome.
-  const { inspectMode, terminalOpen, setTerminalOpen } = useInspect();
-  // Prioridade fixa: Inspect > Terminal aberto > idle (seção 6 do brief).
-  const bobState = inspectMode ? "inspect" : terminalOpen ? "active" : "idle";
+  // terminalOpen vive no InspectProvider e agora é escrito só por
+  // enable/disableDevMode — Hero apenas consome, não abre nem fecha.
+  const { inspectMode, terminalOpen } = useInspect();
+  // Dois estados nesta UX, porque só existe uma porta: Developer Mode ON =
+  // inspect, OFF = idle. O estado "active" continua existindo no Bob para uso
+  // futuro (ele descrevia "terminal aberto sem Inspect", combinação que a
+  // entrada única eliminou).
+  const bobState = inspectMode ? "inspect" : "idle";
   const ref = useRef(null);
   const mx = useMotionValue(0);
   const my = useMotionValue(0);
@@ -212,11 +233,13 @@ export default function Hero() {
         >
           {/* Empilhado no mobile (Bob abaixo do terminal, cada um com a
               largura toda) — lado a lado só a partir de md, onde sobra
-              espaço real pros dois sem apertar/cortar o terminal. */}
+              espaço real pros dois sem apertar/cortar o terminal. Com o
+              Developer Mode OFF o Terminal não renderiza nada e sobra só a
+              coluna do Bob, que justify-center centraliza sozinha — por isso
+              o Terminal carrega a própria largura em vez de um wrapper fixo,
+              que ficaria ocupando metade da linha vazio. */}
           <div className="mx-auto flex max-w-3xl flex-col items-center justify-center gap-4 md:flex-row md:items-end">
-            <div className="w-full max-w-2xl">
-              <Terminal open={terminalOpen} onOpenChange={setTerminalOpen} />
-            </div>
+            <Terminal open={terminalOpen} />
             <div className="flex shrink-0 flex-col items-center gap-1.5 md:pb-6">
               {/* interactive: o próprio Bob já faz o gate completo (hover:hover +
                   pointer:fine + !reduced-motion) em canFollowPointer() — não

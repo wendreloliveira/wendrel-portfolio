@@ -117,18 +117,31 @@ function runCommand(raw, inspect) {
       return [args[0], names.join(" · ")];
     }
 
+    // DÍVIDA (próxima fase): com o Terminal existindo só dentro do Developer
+    // Mode, `inspect on` virou permanentemente redundante (o Terminal já
+    // prova que Inspect está ON) e `inspect off` na prática desliga o
+    // Developer Mode inteiro, não só as anotações. Os nomes ficaram menores
+    // que o efeito. Renomear/reagrupar esses comandos é refatoração própria —
+    // aqui só se garante que nenhum deles produza estado paradoxal.
     case "inspect": {
       const sub = args[0];
       if (!sub) return [`Inspect Mode: ${inspect.inspectMode ? "ON" : "OFF"}`];
       if (sub === "on") {
+        // Inalcançável como "ativar": o Terminal só é renderizado com
+        // inspectMode ON. Fica como resposta honesta ao comando digitado.
         if (inspect.inspectMode) return ["Inspect Mode já está ativo."];
         inspect.enableInspect();
         return ["Inspect Mode ativado."];
       }
       if (sub === "off") {
         if (!inspect.inspectMode) return ["Inspect Mode já está desativado."];
-        inspect.disableInspect();
-        return ["Inspect Mode desativado."];
+        // Sai pelo Developer Mode inteiro (Terminal incluído) em vez de só
+        // disableInspect() — senão sobrava um Terminal aberto com Inspect
+        // desligado, exatamente o estado que o Developer Mode não admite
+        // mais. requestDevModeOff dá o tempo curto pra esta linha ser lida
+        // antes do Terminal recolher.
+        inspect.requestDevModeOff();
+        return ["Inspect Mode desativado.", "Developer Mode disabled."];
       }
       return ["uso: inspect [on|off]"];
     }
@@ -170,10 +183,11 @@ function runCommand(raw, inspect) {
 
 // Console interativo do Hero — funcionalidade real, não decoração.
 // Estado local simples: histórico de linhas renderizadas + input controlado.
-// `open`/`onOpenChange` controlam o estado de aberto/fechado de fora —
-// Terminal não guarda mais isOpen sozinho, porque o Developer Mode
-// (InspectProvider) precisa poder abrir/fechar o Terminal, não só observar.
-export default function Terminal({ open, onOpenChange }) {
+// `open` vem de fora (terminalOpen do InspectProvider) e é read-only: o
+// Terminal deixou de ser uma feature independente do Hero e passou a ser a
+// camada que o Developer Mode abre. Não existe mais CTA de abrir o Terminal,
+// então também não existe mais onOpenChange.
+export default function Terminal({ open }) {
   const inspect = useInspect();
   const [lines, setLines] = useState([]);
   const [value, setValue] = useState("");
@@ -270,6 +284,12 @@ export default function Terminal({ open, onOpenChange }) {
     }
   }
 
+  // Fechado não renderiza nada — Developer Mode OFF é um Hero limpo, sem
+  // resto de Terminal recolhido. Retornar null (em vez do Hero desmontar o
+  // componente) mantém a instância viva: histórico de comandos, linhas já
+  // impressas e o ref de transição do boot sobrevivem ao ciclo ON → OFF → ON.
+  if (!open) return null;
+
   return (
     <div className="mx-auto w-full max-w-2xl">
       <p className="mb-2 font-mono text-xs text-ink-faint">
@@ -288,9 +308,7 @@ export default function Terminal({ open, onOpenChange }) {
           ref={bodyRef}
           onClick={() => inputRef.current?.focus()}
           aria-live="polite"
-          className={`overflow-y-auto p-5 font-mono text-[13px] leading-relaxed transition-[max-height] duration-300 ${
-            open ? "max-h-[360px]" : "max-h-28"
-          }`}
+          className="max-h-[360px] overflow-y-auto p-5 font-mono text-[13px] leading-relaxed"
         >
           {lines.map((line, i) =>
             line.type === "input" ? (
@@ -304,7 +322,7 @@ export default function Terminal({ open, onOpenChange }) {
             )
           )}
 
-          {booted && open && (
+          {booted && (
             <div className="flex items-center gap-2 text-ink">
               <span className="shrink-0 text-signal-green">{PROMPT}</span>
               <input
@@ -323,20 +341,6 @@ export default function Terminal({ open, onOpenChange }) {
           )}
         </div>
       </div>
-
-      {/* Sem md:hidden: antes só existia no mobile porque desktop sempre
-          nascia aberto e não tinha como fechar. Agora Developer Mode pode
-          fechar o Terminal em qualquer breakpoint, então precisa de como
-          reabrir manualmente em qualquer breakpoint também. */}
-      {!open && (
-        <button
-          type="button"
-          onClick={() => onOpenChange(true)}
-          className="mt-3 inline-flex items-center gap-2 rounded-full border border-base-border bg-base-surface/60 px-4 py-2 text-xs text-ink-muted transition-colors hover:text-ink"
-        >
-          Abrir terminal
-        </button>
-      )}
     </div>
   );
 }
