@@ -196,7 +196,10 @@ export default function Hero() {
               <Terminal onOpenChange={setTerminalOpen} />
             </div>
             <div className="flex shrink-0 flex-col items-center gap-1.5 md:pb-6">
-              <Bob state={bobState} size="md" interactive={false} />
+              {/* interactive: o próprio Bob já faz o gate completo (hover:hover +
+                  pointer:fine + !reduced-motion) em canFollowPointer() — não
+                  duplicar matchMedia aqui, uma fonte de regra só. */}
+              <Bob state={bobState} size="md" interactive />
               <p className="text-center font-mono text-[10px] uppercase tracking-wide text-ink-faint">
                 Bob — Terminal Bot
               </p>
