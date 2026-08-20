@@ -170,15 +170,14 @@ function runCommand(raw, inspect) {
 
 // Console interativo do Hero — funcionalidade real, não decoração.
 // Estado local simples: histórico de linhas renderizadas + input controlado.
-// Terminal continua dono do próprio `isOpen` — `onOpenChange` só notifica um
-// ancestral (ex.: Bob, no Hero) sem exigir Context/Provider novo pra isso.
-export default function Terminal({ onOpenChange }) {
+// `open`/`onOpenChange` controlam o estado de aberto/fechado de fora —
+// Terminal não guarda mais isOpen sozinho, porque o Developer Mode
+// (InspectProvider) precisa poder abrir/fechar o Terminal, não só observar.
+export default function Terminal({ open, onOpenChange }) {
   const inspect = useInspect();
   const [lines, setLines] = useState([]);
   const [value, setValue] = useState("");
   const [booted, setBooted] = useState(false);
-  // Mobile começa recolhido (poucas linhas); desktop já nasce expandido.
-  const [isOpen, setIsOpen] = useState(() => typeof window !== "undefined" && window.innerWidth >= 768);
 
   const bodyRef = useRef(null);
   const inputRef = useRef(null);
@@ -186,11 +185,6 @@ export default function Terminal({ onOpenChange }) {
   // re-render a cada tecla, por isso fica em ref e não em state.
   const commandHistory = useRef([]);
   const historyIndex = useRef(0);
-
-  useEffect(() => {
-    onOpenChange?.(isOpen);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isOpen]);
 
   // Sequência automática de boot: digita "whoami" sozinho, mostra a saída e
   // só então libera o controle para o visitante.
@@ -267,7 +261,7 @@ export default function Terminal({ onOpenChange }) {
           onClick={() => inputRef.current?.focus()}
           aria-live="polite"
           className={`overflow-y-auto p-5 font-mono text-[13px] leading-relaxed transition-[max-height] duration-300 ${
-            isOpen ? "max-h-[360px]" : "max-h-28"
+            open ? "max-h-[360px]" : "max-h-28"
           }`}
         >
           {lines.map((line, i) =>
@@ -282,7 +276,7 @@ export default function Terminal({ onOpenChange }) {
             )
           )}
 
-          {booted && isOpen && (
+          {booted && open && (
             <div className="flex items-center gap-2 text-ink">
               <span className="shrink-0 text-signal-green">{PROMPT}</span>
               <input
@@ -302,11 +296,15 @@ export default function Terminal({ onOpenChange }) {
         </div>
       </div>
 
-      {!isOpen && (
+      {/* Sem md:hidden: antes só existia no mobile porque desktop sempre
+          nascia aberto e não tinha como fechar. Agora Developer Mode pode
+          fechar o Terminal em qualquer breakpoint, então precisa de como
+          reabrir manualmente em qualquer breakpoint também. */}
+      {!open && (
         <button
           type="button"
-          onClick={() => setIsOpen(true)}
-          className="mt-3 inline-flex items-center gap-2 rounded-full border border-base-border bg-base-surface/60 px-4 py-2 text-xs text-ink-muted transition-colors hover:text-ink md:hidden"
+          onClick={() => onOpenChange(true)}
+          className="mt-3 inline-flex items-center gap-2 rounded-full border border-base-border bg-base-surface/60 px-4 py-2 text-xs text-ink-muted transition-colors hover:text-ink"
         >
           Abrir terminal
         </button>

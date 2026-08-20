@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useRef } from "react";
 import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { HiArrowRight } from "react-icons/hi";
 import GridBackground from "../components/GridBackground";
@@ -24,12 +24,34 @@ function heroInspectLines(notes) {
   ];
 }
 
+// Controle principal do Developer Mode — vive perto do Bob (mobile e
+// desktop) porque é onde o efeito realmente acontece. Mesma fonte de
+// estado que o chip da Navbar (toggleDevMode/inspectMode do InspectProvider),
+// então os dois nunca divergem. Texto muda com o estado porque este botão
+// precisa comunicar a ação disponível, diferente do chip compacto da Navbar.
+function DevModeButton() {
+  const { inspectMode, toggleDevMode } = useInspect();
+  return (
+    <button
+      type="button"
+      onClick={toggleDevMode}
+      aria-pressed={inspectMode}
+      className={`inline-flex items-center gap-1.5 whitespace-nowrap rounded-full border px-3 py-1.5 font-mono text-[10px] transition-colors duration-150 ${
+        inspectMode
+          ? "border-signal-blue/50 bg-signal-blue/10 text-signal-blue"
+          : "border-base-border text-ink-muted hover:border-ink-faint hover:text-ink"
+      }`}
+    >
+      <span aria-hidden="true">{"</>"}</span>
+      {inspectMode ? "Desativar modo desenvolvedor" : "Ativar modo desenvolvedor"}
+    </button>
+  );
+}
+
 export default function Hero() {
-  const { inspectMode } = useInspect();
-  // Terminal continua dono do próprio `isOpen` — só espelha aqui via
-  // onOpenChange, sem Provider novo (Bob e Terminal são ambos filhos diretos
-  // do Hero, então esse é o ancestral comum mínimo).
-  const [terminalOpen, setTerminalOpen] = useState(false);
+  // terminalOpen agora vive no InspectProvider (Developer Mode precisa abrir
+  // e fechar o Terminal, não só observar) — Hero só consome.
+  const { inspectMode, terminalOpen, setTerminalOpen } = useInspect();
   // Prioridade fixa: Inspect > Terminal aberto > idle (seção 6 do brief).
   const bobState = inspectMode ? "inspect" : terminalOpen ? "active" : "idle";
   const ref = useRef(null);
@@ -193,7 +215,7 @@ export default function Hero() {
               espaço real pros dois sem apertar/cortar o terminal. */}
           <div className="mx-auto flex max-w-3xl flex-col items-center justify-center gap-4 md:flex-row md:items-end">
             <div className="w-full max-w-2xl">
-              <Terminal onOpenChange={setTerminalOpen} />
+              <Terminal open={terminalOpen} onOpenChange={setTerminalOpen} />
             </div>
             <div className="flex shrink-0 flex-col items-center gap-1.5 md:pb-6">
               {/* interactive: o próprio Bob já faz o gate completo (hover:hover +
@@ -203,6 +225,7 @@ export default function Hero() {
               <p className="text-center font-mono text-[10px] uppercase tracking-wide text-ink-faint">
                 Bob — Terminal Bot
               </p>
+              <DevModeButton />
             </div>
           </div>
         </motion.div>
