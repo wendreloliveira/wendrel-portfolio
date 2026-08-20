@@ -87,6 +87,21 @@ Branches de diagnóstico preservadas (não deletar ainda): `diag/mobile-paint-st
 - Inspect e Tech ↔ Project Graph coexistem sem interferência;
 - mobile progressive enhancement, sem dependência nova.
 
+## V2.4 — Terminal 2.0
+
+- OPENABLE removido;
+- projetos vêm da Data Truth Layer (`getAllProjects()`/`getProjectBySlug()`);
+- `projects`;
+- `stack <project>`;
+- `skills [category]`;
+- `inspect` / `inspect on` / `inspect off`;
+- `open` navega internamente por slug;
+- `visit` só abre quando existe `liveUrl` real;
+- `InspectProvider` ganhou `enableInspect`/`disableInspect` explícitos;
+- histórico ArrowUp/ArrowDown preservado;
+- `aria-live="polite"` na saída;
+- sem dependência nova.
+
 ## Próxima fase
 
 Nenhuma pendência aberta. Deployed em https://wendrel-portfolio.vercel.app, com metadados de produção finalizados e os dois bugs de mobile Safari corrigidos.
