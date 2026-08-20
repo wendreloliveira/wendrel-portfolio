@@ -333,7 +333,7 @@ export default function Terminal({ open }) {
                 spellCheck={false}
                 autoComplete="off"
                 aria-label="Terminal do portfólio — digite um comando (experimente 'help')"
-                className="min-w-0 flex-1 bg-transparent text-base outline-none placeholder:text-ink-faint"
+                className="min-w-0 flex-1 bg-transparent text-base text-ink outline-none placeholder:text-ink-faint"
                 placeholder="help"
               />
               <span className="h-3.5 w-1.5 shrink-0 animate-blink bg-signal-blue" aria-hidden="true" />
