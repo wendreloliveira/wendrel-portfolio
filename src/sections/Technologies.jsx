@@ -61,16 +61,20 @@ export default function Technologies() {
                   {group.items.map((item) => {
                     // Nome vem do registry quando há techId; "SQL" (sem
                     // tecnologia canônica confirmada) usa o `name` literal e
-                    // fica de fora do grafo — não participa da relação.
+                    // fica de fora da RELAÇÃO semântica do grafo (nunca vira
+                    // hover trigger, nunca fica "active"/"related" — id
+                    // undefined nunca bate com um id real). Mas ainda
+                    // participa do ESTADO AMBIENTAL: relationState() roda
+                    // sempre, então "dimmed" ainda se aplica quando algo
+                    // mais está ativo em qualquer lugar da seção — só isso
+                    // já resolve o item parecer "fora" da animação.
                     const name = item.techId ? technologyRegistry[item.techId]?.name : item.name;
                     const Icon = item.techId ? ICONS[item.techId] : null;
-                    const state = item.techId
-                      ? relationState({
-                          isActive: item.techId === activeTechId,
-                          isRelated: relatedTechIds.includes(item.techId),
-                          anyActive: !!activeTechId || !!activeProjectId,
-                        })
-                      : "idle";
+                    const state = relationState({
+                      isActive: item.techId === activeTechId,
+                      isRelated: relatedTechIds.includes(item.techId),
+                      anyActive: !!activeTechId || !!activeProjectId,
+                    });
                     return (
                       <div
                         key={item.techId ?? item.name}

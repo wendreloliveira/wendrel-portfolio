@@ -2,6 +2,7 @@ import { useState } from "react";
 import Reveal from "../components/Reveal";
 import ProjectPreview from "../components/ProjectPreview";
 import ProjectCase from "../components/ProjectCase";
+import ProjectDivider from "../components/ProjectDivider";
 import ProjectDisclosure from "../components/ProjectDisclosure";
 import TechSignature from "../components/TechSignature";
 import TechStackInspect from "../components/TechStackInspect";
@@ -147,13 +148,15 @@ export default function Projects() {
 
         <div className="mt-4">
           {sortedFeatured.map((project, i) => (
-            <ProjectCase
-              key={project.slug}
-              project={project}
-              index={i}
-              isExpanded={expandedProjectId === project.slug}
-              onToggleExpand={toggleExpanded}
-            />
+            <div key={project.slug}>
+              {i > 0 && <ProjectDivider nextIndex={i} />}
+              <ProjectCase
+                project={project}
+                index={i}
+                isExpanded={expandedProjectId === project.slug}
+                onToggleExpand={toggleExpanded}
+              />
+            </div>
           ))}
         </div>
 

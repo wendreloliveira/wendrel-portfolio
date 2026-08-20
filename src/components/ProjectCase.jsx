@@ -149,7 +149,9 @@ export default function ProjectCase({ project, index, isExpanded, onToggleExpand
         onBlur={(e) => {
           if (!e.currentTarget.contains(e.relatedTarget)) clearActiveProject();
         }}
-        className={`scroll-mt-24 border-t border-base-border py-20 transition-opacity duration-150 first:border-t-0 first:pt-0 sm:py-24 ${
+        // Sem border-t/first: aqui — a separação entre cases agora é o
+        // ProjectDivider (Projects.jsx), única fonte da linha de fronteira.
+        className={`scroll-mt-24 py-20 transition-opacity duration-150 sm:py-24 ${
           graphState === "dimmed" ? "opacity-55" : "opacity-100"
         }`}
       >
@@ -169,9 +171,6 @@ export default function ProjectCase({ project, index, isExpanded, onToggleExpand
 
           <h3 className="mt-3 font-display text-3xl font-semibold tracking-tight text-ink sm:text-4xl">{title}</h3>
           {tagline && <p className="mt-3 text-ink-muted">{tagline}</p>}
-          {highlights?.length > 0 && (
-            <p className="mt-3 font-mono text-[11px] uppercase tracking-wide text-ink-faint">{highlights.join(" · ")}</p>
-          )}
 
           {/* Modo normal + recolhido: zero stack. Developer Mode + recolhido
               (estado C): assinatura compacta só de primaryTechIds. */}
@@ -234,6 +233,20 @@ export default function ProjectCase({ project, index, isExpanded, onToggleExpand
               <Field label="Contexto">{contextText}</Field>
               <Field label="Minha participação">{role}</Field>
             </div>
+
+            {/* Destaques (ex.: "291 testes automatizados"): editorial, não
+                é uma linha de stack — mora aqui desde a V2.7A pra não
+                vazar tecnologia (ex.: "Flask + PostgreSQL") no card
+                recolhido em modo normal nem duplicar a assinatura
+                compacta do Developer Mode. */}
+            {highlights?.length > 0 && (
+              <div className="mt-8">
+                <p className="font-mono text-[11px] uppercase tracking-widest text-signal-blue">Destaques</p>
+                <p className="mt-1.5 font-mono text-[11px] uppercase tracking-wide text-ink-faint">
+                  {highlights.join(" · ")}
+                </p>
+              </div>
+            )}
 
             {decisions?.length > 0 && (
               <div className="mt-8">
