@@ -30,9 +30,6 @@ export default function Hero() {
   // onOpenChange, sem Provider novo (Bob e Terminal são ambos filhos diretos
   // do Hero, então esse é o ancestral comum mínimo).
   const [terminalOpen, setTerminalOpen] = useState(false);
-  // Mesmo padrão que o próprio Terminal já usa pro isOpen inicial — lido
-  // uma vez no mount, sem listener de resize.
-  const [bobSize] = useState(() => (typeof window !== "undefined" && window.innerWidth >= 768 ? "md" : "sm"));
   // Prioridade fixa: Inspect > Terminal aberto > idle (seção 6 do brief).
   const bobState = inspectMode ? "inspect" : terminalOpen ? "active" : "idle";
   const ref = useRef(null);
@@ -199,7 +196,7 @@ export default function Hero() {
               <Terminal onOpenChange={setTerminalOpen} />
             </div>
             <div className="flex shrink-0 flex-col items-center gap-1.5 md:pb-6">
-              <Bob state={bobState} size={bobSize} interactive={false} />
+              <Bob state={bobState} size="md" interactive={false} />
               <p className="text-center font-mono text-[10px] uppercase tracking-wide text-ink-faint">
                 Bob — Terminal Bot
               </p>
